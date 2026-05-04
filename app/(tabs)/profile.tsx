@@ -88,6 +88,21 @@ export default function ProfileScreen() {
               <IconSymbol name="chevron.right" size={20} color={colors.muted} />
             </TouchableOpacity>
 
+            {/* Call History */}
+            <TouchableOpacity
+              onPress={() => {
+                // @ts-ignore
+                router.push("/call-history");
+              }}
+              className="bg-surface rounded-lg p-4 flex-row items-center justify-between"
+            >
+              <View className="flex-row items-center gap-3">
+                <IconSymbol name="phone.fill" size={20} color={colors.primary} />
+                <Text className="text-base text-foreground">Call History</Text>
+              </View>
+              <IconSymbol name="chevron.right" size={20} color={colors.muted} />
+            </TouchableOpacity>
+
             {/* Help */}
             <TouchableOpacity className="bg-surface rounded-lg p-4 flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">

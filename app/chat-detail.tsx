@@ -14,6 +14,7 @@ import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { MessageBubble } from "@/components/message-bubble";
 import { ReactionPicker } from "@/components/reaction-picker";
+import { CallButton } from "@/components/call-button";
 import { useColors } from "@/hooks/use-colors";
 import { useAuth } from "@/lib/auth-provider";
 import { useChat } from "@/hooks/use-chat";
@@ -101,9 +102,11 @@ export default function ChatDetailScreen() {
             </View>
           </View>
           <View className="flex-row gap-3">
-            <TouchableOpacity className="bg-primary rounded-full w-10 h-10 items-center justify-center">
-              <IconSymbol name="phone.fill" size={18} color="white" />
-            </TouchableOpacity>
+            <CallButton
+              recipientId={chatId}
+              recipientName={chatName}
+              recipientAvatar="https://api.dicebear.com/7.x/avataaars/svg?seed=default"
+            />
             <TouchableOpacity className="bg-primary rounded-full w-10 h-10 items-center justify-center">
               <IconSymbol name="ellipsis" size={18} color="white" />
             </TouchableOpacity>

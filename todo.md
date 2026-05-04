@@ -32,14 +32,16 @@
 - [ ] Add message reply/quoting feature
 
 ## Phase 5: Audio Calls
-- [ ] Integrate WebRTC or Agora SDK for audio calls
-- [ ] Build Incoming Call screen with accept/reject
-- [ ] Create Active Call screen with controls
-- [ ] Implement mute/unmute functionality
-- [ ] Add speaker/earpiece toggle
-- [ ] Implement call end functionality
-- [ ] Create call history tracking
+- [x] Integrate WebRTC for audio calls
+- [x] Create call service with signaling
+- [x] Build Incoming Call screen with accept/reject
+- [x] Create Active Call screen with controls
+- [x] Implement mute/unmute functionality
+- [x] Add speaker/earpiece toggle
+- [x] Implement call end functionality
+- [x] Create call history tracking
 - [ ] Add missed call notifications
+- [x] Implement call ringtone and vibration
 
 ## Phase 6: Advanced Messaging Features
 - [x] Create message reactions (emoji picker)
