@@ -18,7 +18,20 @@ const MAPPING = {
   "paperplane.fill": "send",
   "chevron.left.forwardslash.chevron.right": "code",
   "chevron.right": "chevron-right",
-} as IconMapping;
+  "message.fill": "chat",
+  "person.2.fill": "people",
+  "person.fill": "person",
+  "phone.fill": "call",
+  "mic.fill": "mic",
+  "xmark": "close",
+  "checkmark": "check",
+  "checkmark.2": "done-all",
+  "plus": "add",
+  "ellipsis": "more-vert",
+  "magnifyingglass": "search",
+  "gear": "settings",
+  "arrow.left": "arrow-back",
+} as unknown as IconMapping;
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.
