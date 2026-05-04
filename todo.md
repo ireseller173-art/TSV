@@ -55,7 +55,17 @@
 - [ ] Create pinned messages feature
 - [ ] Add message mentions (@username)
 
-## Phase 7: Contacts & User Management
+## Phase 7: Push Notifications (FCM)
+- [x] Create NotificationProvider for app-wide notification management
+- [x] Implement message notification sending
+- [x] Implement incoming call notification
+- [x] Implement missed call notification
+- [x] Implement reaction notification
+- [ ] Deploy Cloud Functions for server-side notifications
+- [ ] Register device tokens with Firestore
+- [ ] Test notifications on real devices
+
+## Phase 8: Contacts & User Management
 - [x] Build Contacts screen with user list
 - [ ] Add online/offline status indicators
 - [ ] Implement "last seen" timestamps
