@@ -46,7 +46,10 @@
 ## Phase 6: Advanced Messaging Features
 - [x] Create message reactions (emoji picker)
 - [ ] Implement voice message recording & playback
-- [ ] Add image message support (pick & send)
+- [x] Add image message support (pick & send)
+- [x] Implement video message support
+- [x] Create media preview before sending
+- [x] Add image compression and optimization
 - [ ] Implement message forwarding
 - [ ] Add message search functionality
 - [ ] Create pinned messages feature

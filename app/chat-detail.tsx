@@ -15,6 +15,8 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { MessageBubble } from "@/components/message-bubble";
 import { ReactionPicker } from "@/components/reaction-picker";
 import { CallButton } from "@/components/call-button";
+import { MediaPicker } from "@/components/media-picker";
+import { MediaPreview } from "@/components/media-preview";
 import { useColors } from "@/hooks/use-colors";
 import { useAuth } from "@/lib/auth-provider";
 import { useChat } from "@/hooks/use-chat";
@@ -34,6 +36,10 @@ export default function ChatDetailScreen() {
   const [messageText, setMessageText] = useState("");
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [showMediaPreview, setShowMediaPreview] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState<any>(null);
+  const [mediaCaption, setMediaCaption] = useState("");
   const flatListRef = useRef<FlatList>(null);
 
   // Scroll to bottom when new messages arrive
@@ -132,7 +138,10 @@ export default function ChatDetailScreen() {
 
         {/* Input Area */}
         <View className="flex-row items-center gap-2 px-4 py-3 border-t border-border">
-          <TouchableOpacity className="bg-primary rounded-full w-10 h-10 items-center justify-center">
+          <TouchableOpacity
+            onPress={() => setShowMediaPicker(true)}
+            className="bg-primary rounded-full w-10 h-10 items-center justify-center"
+          >
             <IconSymbol name="plus" size={20} color="white" />
           </TouchableOpacity>
 
@@ -162,6 +171,39 @@ export default function ChatDetailScreen() {
         visible={showReactionPicker}
         onSelect={handleReaction}
         onClose={() => setShowReactionPicker(false)}
+      />
+
+      {/* Media Picker */}
+      <MediaPicker
+        visible={showMediaPicker}
+        onMediaSelected={(media) => {
+          setSelectedMedia(media);
+          setShowMediaPicker(false);
+          setShowMediaPreview(true);
+        }}
+        onCancel={() => setShowMediaPicker(false)}
+      />
+
+      {/* Media Preview */}
+      <MediaPreview
+        visible={showMediaPreview}
+        media={selectedMedia}
+        caption={mediaCaption}
+        onCaptionChange={setMediaCaption}
+        onSend={() => {
+          // Send media message
+          if (selectedMedia && user) {
+            console.log("Sending media:", selectedMedia.fileName);
+            setShowMediaPreview(false);
+            setSelectedMedia(null);
+            setMediaCaption("");
+          }
+        }}
+        onCancel={() => {
+          setShowMediaPreview(false);
+          setSelectedMedia(null);
+          setMediaCaption("");
+        }}
       />
     </KeyboardAvoidingView>
   );
