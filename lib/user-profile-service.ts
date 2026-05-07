@@ -10,6 +10,7 @@ export interface UserProfile {
   avatar?: string;
   status?: string;
   bio?: string;
+  language?: 'en' | 'ru';
   createdAt: number;
   updatedAt: number;
   lastSeen?: number;
@@ -41,6 +42,7 @@ export class UserProfileService {
         avatar: profile.avatar || existing?.avatar,
         status: profile.status || existing?.status || 'Hey there!',
         bio: profile.bio || existing?.bio,
+        language: profile.language || existing?.language || 'en',
         createdAt: existing?.createdAt || now,
         updatedAt: now,
         lastSeen: existing?.lastSeen,

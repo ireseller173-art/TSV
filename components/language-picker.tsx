@@ -14,6 +14,8 @@ import { useI18n } from '@/hooks/use-i18n';
 import { useColors } from '@/hooks/use-colors';
 import { MaterialIcons } from '@expo/vector-icons';
 import Haptics from 'expo-haptics';
+import { useAuth } from '@/lib/auth-provider';
+import { UserProfileService } from '@/lib/user-profile-service';
 
 interface LanguagePickerProps {
   onLanguageChange?: (language: 'en' | 'ru') => void;
@@ -28,6 +30,8 @@ export function LanguagePicker({ onLanguageChange }: LanguagePickerProps) {
     { code: 'ru' as const, name: 'Русский', flag: '🇷🇺' },
   ];
 
+  const { user } = useAuth();
+
   const handleLanguageChange = async (newLanguage: 'en' | 'ru') => {
     if (newLanguage === language) return;
 
@@ -36,7 +40,17 @@ export function LanguagePicker({ onLanguageChange }: LanguagePickerProps) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
 
+      // Update language in AsyncStorage and context
       await setLanguage(newLanguage);
+
+      // Save language to user profile
+      if (user?.id) {
+        await UserProfileService.saveProfile({
+          id: user.id,
+          language: newLanguage,
+        });
+      }
+
       onLanguageChange?.(newLanguage);
     } catch (error) {
       console.error('Error changing language:', error);

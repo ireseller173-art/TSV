@@ -7,52 +7,67 @@ const db = admin.firestore();
 const messaging = admin.messaging();
 
 /**
- * Translations for error messages
+ * Translations for notifications and error messages
  */
-const errorMessages = {
+const translations = {
   en: {
-    chatNotFound: "Chat not found",
-    noDeviceTokens: "No device tokens for user",
-    errorSendingNotification: "Error sending notification",
-    groupNotFound: "Group not found",
-    errorSendingGroupNotification: "Error sending group notification",
-    userNotAuthenticated: "User not authenticated",
-    errorUpdatingPresence: "Failed to update presence",
-    failedUpdatePresence: "Failed to update presence",
-    deviceTokenRequired: "Device token is required",
-    errorRegisteringToken: "Error registering device token",
-    failedRegisterToken: "Failed to register device token",
-    errorUnregisteringToken: "Error unregistering device token",
-    failedUnregisterToken: "Failed to unregister device token",
-    errorDuringCleanup: "Error during cleanup",
-    newMessage: "New message",
-    userInGroup: "in",
+    errors: {
+      chatNotFound: "Chat not found",
+      noDeviceTokens: "No device tokens for user",
+      errorSendingNotification: "Error sending notification",
+      groupNotFound: "Group not found",
+      errorSendingGroupNotification: "Error sending group notification",
+      userNotAuthenticated: "User not authenticated",
+      errorUpdatingPresence: "Failed to update presence",
+      failedUpdatePresence: "Failed to update presence",
+      deviceTokenRequired: "Device token is required",
+      errorRegisteringToken: "Error registering device token",
+      failedRegisterToken: "Failed to register device token",
+      errorUnregisteringToken: "Error unregistering device token",
+      failedUnregisterToken: "Failed to unregister device token",
+      errorDuringCleanup: "Error during cleanup",
+    },
+    notifications: {
+      newMessage: "New message",
+      userInGroup: "in",
+    },
   },
   ru: {
-    chatNotFound: "Чат не найден",
-    noDeviceTokens: "Нет токенов устройства для пользователя",
-    errorSendingNotification: "Ошибка при отправке уведомления",
-    groupNotFound: "Группа не найдена",
-    errorSendingGroupNotification: "Ошибка при отправке группового уведомления",
-    userNotAuthenticated: "Пользователь не аутентифицирован",
-    errorUpdatingPresence: "Не удалось обновить статус",
-    failedUpdatePresence: "Не удалось обновить статус",
-    deviceTokenRequired: "Требуется токен устройства",
-    errorRegisteringToken: "Ошибка при регистрации токена",
-    failedRegisterToken: "Не удалось зарегистрировать токен",
-    errorUnregisteringToken: "Ошибка при отмене регистрации токена",
-    failedUnregisterToken: "Не удалось отменить регистрацию токена",
-    errorDuringCleanup: "Ошибка во время очистки",
-    newMessage: "Новое сообщение",
-    userInGroup: "в",
+    errors: {
+      chatNotFound: "Чат не найден",
+      noDeviceTokens: "Нет токенов устройства для пользователя",
+      errorSendingNotification: "Ошибка при отправке уведомления",
+      groupNotFound: "Группа не найдена",
+      errorSendingGroupNotification: "Ошибка при отправке группового уведомления",
+      userNotAuthenticated: "Пользователь не аутентифицирован",
+      errorUpdatingPresence: "Не удалось обновить статус",
+      failedUpdatePresence: "Не удалось обновить статус",
+      deviceTokenRequired: "Требуется токен устройства",
+      errorRegisteringToken: "Ошибка при регистрации токена",
+      failedRegisterToken: "Не удалось зарегистрировать токен",
+      errorUnregisteringToken: "Ошибка при отмене регистрации токена",
+      failedUnregisterToken: "Не удалось отменить регистрацию токена",
+      errorDuringCleanup: "Ошибка во время очистки",
+    },
+    notifications: {
+      newMessage: "Новое сообщение",
+      userInGroup: "в",
+    },
   },
 };
 
 /**
  * Get error message in specified language
  */
-function getErrorMessage(key: keyof typeof errorMessages.en, language: "en" | "ru" = "en"): string {
-  return errorMessages[language]?.[key] || errorMessages.en[key];
+function getErrorMessage(key: keyof typeof translations.en.errors, language: "en" | "ru" = "en"): string {
+  return translations[language]?.errors[key] || translations.en.errors[key];
+}
+
+/**
+ * Get notification message in specified language
+ */
+function getNotificationMessage(key: keyof typeof translations.en.notifications, language: "en" | "ru" = "en"): string {
+  return translations[language]?.notifications[key] || translations.en.notifications[key];
 }
 
 /**
@@ -92,10 +107,13 @@ export const sendMessageNotification = functions.firestore
         return;
       }
 
-      // Отправить push-уведомление
+      // Get recipient's language preference (default to English)
+      const recipientLanguage = (recipientData.language || "en") as "en" | "ru";
+
+      // Отправить push-уведомление с локализацией
       const payload = {
         notification: {
-          title: senderData?.name || getErrorMessage("newMessage", "ru"),
+          title: senderData?.name || getNotificationMessage("newMessage", recipientLanguage),
           body: message.text.substring(0, 100),
           sound: "default",
         },
@@ -103,6 +121,7 @@ export const sendMessageNotification = functions.firestore
           chatId,
           messageId: context.params.messageId,
           senderId: message.senderId,
+          language: recipientLanguage,
         },
       };
 
@@ -166,9 +185,12 @@ export const sendGroupMessageNotification = functions.firestore
           continue;
         }
 
+        // Get recipient's language preference (default to English)
+        const recipientLanguage = (recipientData.language || "en") as "en" | "ru";
+
         const payload = {
           notification: {
-            title: `${senderData?.name || "User"} ${getErrorMessage("userInGroup", "ru")} ${groupData.name}`,
+            title: `${senderData?.name || "User"} ${getNotificationMessage("userInGroup", recipientLanguage)} ${groupData.name}`,
             body: message.text.substring(0, 100),
             sound: "default",
           },
@@ -177,6 +199,7 @@ export const sendGroupMessageNotification = functions.firestore
             messageId: context.params.messageId,
             senderId: message.senderId,
             isGroup: "true",
+            language: recipientLanguage,
           },
         };
 
