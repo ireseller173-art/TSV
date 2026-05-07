@@ -3,10 +3,10 @@ import {
   View,
   Text,
   FlatList,
-  TouchableOpacity,
   TextInput,
   Image,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
@@ -15,6 +15,8 @@ import { useColors } from "@/hooks/use-colors";
 import { useAuth } from "@/lib/auth-provider";
 import { useI18n } from "@/hooks/use-i18n";
 import { ChatContextMenu } from "@/components/chat-context-menu";
+import { PressableButton } from "@/components/pressable-button";
+import { PressableListItem } from "@/components/pressable-list-item";
 
 interface Chat {
   id: string;
@@ -119,7 +121,7 @@ export default function ChatsScreen() {
   };
 
   const renderChatItem = ({ item }: { item: Chat }) => (
-    <TouchableOpacity
+    <PressableListItem
       onPress={() => {
         router.push({
           pathname: "/chat-detail",
@@ -131,32 +133,26 @@ export default function ChatsScreen() {
           },
         });
       }}
-      onLongPress={() => {
-        setSelectedChatId(item.id);
-        setShowContextMenu(true);
-      }}
-      className="flex-row items-center gap-3 px-4 py-3 border-b border-border"
+      leftIcon={<Image source={{ uri: item.avatar }} style={{ width: 40, height: 40, borderRadius: 20 }} />}
+      rightIcon={item.unread > 0 ? (
+        <View style={{ backgroundColor: colors.primary, borderRadius: 12, width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>{item.unread}</Text>
+        </View>
+      ) : null}
+      showGlow={true}
     >
-      <Image source={{ uri: item.avatar }} className="w-12 h-12 rounded-full" />
-
-      <View className="flex-1 gap-1">
-        <View className="flex-row items-center justify-between">
-          <Text className="text-base font-semibold text-foreground flex-1">
+      <View style={{ flex: 1, gap: 4 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, flex: 1 }}>
             {item.name}
           </Text>
-          <Text className="text-xs text-muted">{item.timestamp}</Text>
+          <Text style={{ fontSize: 12, color: colors.muted }}>{item.timestamp}</Text>
         </View>
-        <Text className="text-sm text-muted" numberOfLines={1}>
+        <Text style={{ fontSize: 12, color: colors.muted }} numberOfLines={1}>
           {item.lastMessage}
         </Text>
       </View>
-
-      {item.unread > 0 && (
-        <View className="bg-accent rounded-full w-6 h-6 items-center justify-center">
-          <Text className="text-white text-xs font-bold">{item.unread}</Text>
-        </View>
-      )}
-    </TouchableOpacity>
+    </PressableListItem>
   );
 
   return (
@@ -164,15 +160,28 @@ export default function ChatsScreen() {
       <View className="px-4 pt-4 gap-4">
         <View className="flex-row items-center justify-between">
           <Text className="text-2xl font-bold text-foreground">{t('chat.messages')}</Text>
-          <TouchableOpacity
+          <Pressable
             onPress={() => {
               // @ts-ignore
               router.push("/new-chat");
             }}
-            className="bg-primary rounded-full w-10 h-10 items-center justify-center"
+            style={({ pressed }) => [{
+              backgroundColor: colors.primary,
+              borderRadius: 20,
+              width: 40,
+              height: 40,
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: pressed ? 0.8 : 1,
+              shadowColor: colors.primary,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: pressed ? 0.4 : 0.1,
+              shadowRadius: 4,
+              elevation: pressed ? 8 : 2,
+            }]}
           >
             <IconSymbol name="plus" size={20} color="white" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View className="flex-row items-center gap-2 bg-surface border border-border rounded-lg px-3 py-2">
@@ -194,15 +203,16 @@ export default function ChatsScreen() {
       ) : filteredChats.length === 0 ? (
         <View className="flex-1 items-center justify-center gap-2">
           <Text className="text-lg text-muted">{t('chat.noChats')}</Text>
-          <TouchableOpacity
+          <PressableButton
             onPress={() => {
               // @ts-ignore
               router.push("/contacts");
             }}
-            className="mt-4 bg-primary px-6 py-2 rounded-lg"
-          >
-            <Text className="text-white font-semibold">{t('chat.startChatting')}</Text>
-          </TouchableOpacity>
+            label={t('chat.startChatting')}
+            variant="primary"
+            size="medium"
+            showGlow={true}
+          />
         </View>
       ) : (
         <FlatList
