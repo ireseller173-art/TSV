@@ -13,6 +13,7 @@ import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
 import { useAuth } from "@/lib/auth-provider";
+import { useI18n } from "@/hooks/use-i18n";
 
 interface Chat {
   id: string;
@@ -28,6 +29,7 @@ export default function ChatsScreen() {
   const router = useRouter();
   const colors = useColors();
   const { user } = useAuth();
+  const { t, language, toggleLanguage } = useI18n();
   const [chats, setChats] = useState<Chat[]>([]);
   const [filteredChats, setFilteredChats] = useState<Chat[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -82,7 +84,15 @@ export default function ChatsScreen() {
   const renderChatItem = ({ item }: { item: Chat }) => (
     <TouchableOpacity
       onPress={() => {
-        // Navigate to chat detail - will be implemented later
+        router.push({
+          pathname: "/chat-detail",
+          params: {
+            chatId: item.id,
+            chatName: item.name,
+            chatAvatar: item.avatar,
+            isGroup: item.isGroup ? "true" : "false",
+          },
+        });
       }}
       className="flex-row items-center gap-3 px-4 py-3 border-b border-border"
     >
@@ -112,7 +122,7 @@ export default function ChatsScreen() {
     <ScreenContainer className="flex-1 gap-4" edges={["top", "left", "right"]}>
       <View className="px-4 pt-4 gap-4">
         <View className="flex-row items-center justify-between">
-          <Text className="text-2xl font-bold text-foreground">Messages</Text>
+          <Text className="text-2xl font-bold text-foreground">{t('chat.messages')}</Text>
           <TouchableOpacity
             onPress={() => {
               // @ts-ignore
@@ -128,7 +138,7 @@ export default function ChatsScreen() {
           <IconSymbol name="magnifyingglass" size={18} color={colors.muted} />
           <TextInput
             className="flex-1 text-foreground"
-            placeholder="Search conversations"
+            placeholder={t('chat.searchConversations')}
             placeholderTextColor={colors.muted}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -142,7 +152,7 @@ export default function ChatsScreen() {
         </View>
       ) : filteredChats.length === 0 ? (
         <View className="flex-1 items-center justify-center gap-2">
-          <Text className="text-lg text-muted">No conversations yet</Text>
+          <Text className="text-lg text-muted">{t('chat.noChats')}</Text>
           <TouchableOpacity
             onPress={() => {
               // @ts-ignore
@@ -150,7 +160,7 @@ export default function ChatsScreen() {
             }}
             className="mt-4 bg-primary px-6 py-2 rounded-lg"
           >
-            <Text className="text-white font-semibold">Start Chatting</Text>
+            <Text className="text-white font-semibold">{t('chat.startChatting')}</Text>
           </TouchableOpacity>
         </View>
       ) : (

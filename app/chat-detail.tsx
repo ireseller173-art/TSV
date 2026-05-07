@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import { MediaPreview } from "@/components/media-preview";
 import { useColors } from "@/hooks/use-colors";
 import { useAuth } from "@/lib/auth-provider";
 import { useChat } from "@/hooks/use-chat";
+import { useI18n } from "@/hooks/use-i18n";
 import Haptics from "expo-haptics";
 import { Message } from "@/lib/chat-service";
 
@@ -27,6 +28,7 @@ export default function ChatDetailScreen() {
   const router = useRouter();
   const colors = useColors();
   const { user } = useAuth();
+  const { t } = useI18n();
   const { chatId = "1", chatName = "Chat" } = useLocalSearchParams<{
     chatId: string;
     chatName: string;
@@ -104,7 +106,7 @@ export default function ChatDetailScreen() {
             </TouchableOpacity>
             <View className="flex-1">
               <Text className="text-lg font-semibold text-foreground">{chatName}</Text>
-              <Text className="text-xs text-muted">Online</Text>
+              <Text className="text-xs text-muted">{t('common.online')}</Text>
             </View>
           </View>
           <View className="flex-row gap-3">
@@ -122,8 +124,8 @@ export default function ChatDetailScreen() {
         {/* Messages List */}
         {messages.length === 0 ? (
           <View className="flex-1 items-center justify-center gap-2">
-            <Text className="text-lg text-muted">No messages yet</Text>
-            <Text className="text-sm text-muted">Start a conversation!</Text>
+            <Text className="text-lg text-muted">{t('chat.noMessages')}</Text>
+            <Text className="text-sm text-muted">{t('chat.startConversation')}</Text>
           </View>
         ) : (
           <FlatList
@@ -147,7 +149,7 @@ export default function ChatDetailScreen() {
 
           <TextInput
             className="flex-1 bg-surface border border-border rounded-full px-4 py-2 text-foreground"
-            placeholder="Type a message..."
+            placeholder={t('chat.typeMessage')}
             placeholderTextColor={colors.muted}
             value={messageText}
             onChangeText={setMessageText}
