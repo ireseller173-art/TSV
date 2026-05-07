@@ -74,7 +74,34 @@
 - [ ] Create user profile screen
 - [ ] Add profile editing (avatar, status, name)
 - [ ] Implement favorites/starred contacts
-- [ ] Add contact blocking feature
+- [ ] Import contacts from phone book
+- [ ] Manual contact addition
+
+## Phase 9: Localization (Russian/English)
+- [x] Create i18n translation system
+- [x] Translate all UI strings to Russian
+- [x] Implement language switcher
+- [x] Store language preference
+- [ ] Update all screens with translations
+
+## Phase 10: Encryption & Security
+- [x] Implement message encryption (XOR-based demo)
+- [x] Encrypt call data
+- [x] Add encryption key management
+- [ ] Implement end-to-end encryption
+- [x] Add DDoS protection (Cloudflare)
+- [x] Hide IP address with proxy/VPN
+- [x] Implement rate limiting
+- [x] Add security headers
+- [x] Add contact blocking feature
+
+## Phase 11: Contacts Management
+- [x] Import contacts from phone book
+- [x] Manual contact addition
+- [x] Contact search and filtering
+- [x] Favorite/block contacts
+- [x] Contact deduplication
+- [x] Export/import contacts as CSV
 
 ## Phase 8: Group Chats
 - [ ] Create Group Creation screen
