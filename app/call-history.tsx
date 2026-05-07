@@ -3,16 +3,18 @@ import {
   View,
   Text,
   FlatList,
-  TouchableOpacity,
   ActivityIndicator,
   Alert,
   RefreshControl,
+  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
 import { CallHistoryService, CallRecord } from "@/lib/call-history-service";
+import { PressableButton } from "@/components/pressable-button";
+import { PressableListItem } from "@/components/pressable-list-item";
 
 export default function CallHistoryScreen() {
   const router = useRouter();
@@ -90,54 +92,64 @@ export default function CallHistoryScreen() {
     const otherUser = isIncoming ? item.callerName : item.recipientName;
 
     return (
-      <TouchableOpacity
-        className="flex-row items-center gap-3 px-4 py-3 border-b border-border"
+      <PressableListItem
+        onPress={() => {}}
+        leftIcon={
+          <View
+            style={{
+              borderRadius: 20,
+              width: 40,
+              height: 40,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: isMissed ? colors.error : colors.primary,
+            }}
+          >
+            <IconSymbol
+              name="phone.fill"
+              size={20}
+              color="white"
+            />
+          </View>
+        }
+        rightIcon={
+          <View style={{ alignItems: 'flex-end', gap: 8 }}>
+            <Text style={{ fontSize: 12, color: colors.muted }}>
+              {CallHistoryService.formatCallTime(item.timestamp)}
+            </Text>
+            <Pressable
+              onPress={() => handleDeleteCall(item.id)}
+              style={({ pressed }) => [{
+                width: 32,
+                height: 32,
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: pressed ? 0.6 : 1,
+              }]}
+            >
+              <IconSymbol name="trash.fill" size={14} color={colors.error} />
+            </Pressable>
+          </View>
+        }
+        showGlow={true}
       >
-        {/* Call Type Icon */}
-        <View
-          className="rounded-full w-12 h-12 items-center justify-center"
-          style={{
-            backgroundColor: isMissed ? colors.error : colors.primary,
-          }}
-        >
-          <IconSymbol
-            name="phone.fill"
-            size={20}
-            color="white"
-          />
-        </View>
-
-        {/* Call Info */}
-        <View className="flex-1 gap-1">
-          <Text className="text-base font-semibold text-foreground">
+        <View style={{ flex: 1, gap: 4 }}>
+          <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }}>
             {otherUser}
           </Text>
-          <View className="flex-row items-center gap-2">
-            <Text className="text-xs text-muted">
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Text style={{ fontSize: 12, color: colors.muted }}>
               {isIncoming ? '📥 Входящий' : '📤 Исходящий'}
             </Text>
-            {isMissed && <Text className="text-xs" style={{ color: colors.error }}>Пропущен</Text>}
+            {isMissed && <Text style={{ fontSize: 12, color: colors.error }}>Пропущен</Text>}
             {!isMissed && (
-              <Text className="text-xs text-muted">
+              <Text style={{ fontSize: 12, color: colors.muted }}>
                 {CallHistoryService.formatCallDuration(item.duration)}
               </Text>
             )}
           </View>
         </View>
-
-        {/* Time and Delete */}
-        <View className="items-end gap-2">
-          <Text className="text-xs text-muted">
-            {CallHistoryService.formatCallTime(item.timestamp)}
-          </Text>
-          <TouchableOpacity
-            onPress={() => handleDeleteCall(item.id)}
-            className="w-8 h-8 items-center justify-center"
-          >
-            <IconSymbol name="trash.fill" size={14} color={colors.error} />
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
+      </PressableListItem>
     );
   };
 
@@ -145,9 +157,14 @@ export default function CallHistoryScreen() {
     <ScreenContainer className="flex-1" edges={["top", "left", "right"]}>
       {/* Header */}
       <View className="px-4 pt-4 pb-4 flex-row items-center gap-3">
-        <TouchableOpacity onPress={() => router.back()}>
+        <Pressable
+          onPress={() => router.back()}
+          style={({ pressed }) => [{
+            opacity: pressed ? 0.6 : 1,
+          }]}
+        >
           <IconSymbol name="arrow.left" size={24} color={colors.foreground} />
-        </TouchableOpacity>
+        </Pressable>
         <Text className="text-2xl font-bold text-foreground flex-1">История звонков</Text>
       </View>
 
@@ -174,17 +191,26 @@ export default function CallHistoryScreen() {
       {/* Filters */}
       <View className="flex-row px-4 py-3 gap-2">
         {(['all', 'incoming', 'outgoing', 'missed'] as const).map((f) => (
-          <TouchableOpacity
+          <Pressable
             key={f}
             onPress={() => setFilter(f)}
-            className="px-3 py-1 rounded-full"
-            style={{
+            style={({ pressed }) => [{
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: 20,
               backgroundColor: filter === f ? colors.primary : colors.surface,
-            }}
+              opacity: pressed ? 0.8 : 1,
+              shadowColor: filter === f ? colors.primary : 'transparent',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: pressed ? 0.3 : 0,
+              shadowRadius: 4,
+              elevation: pressed ? 4 : 0,
+            }]}
           >
             <Text
-              className="text-xs font-semibold"
               style={{
+                fontSize: 12,
+                fontWeight: '600',
                 color: filter === f ? 'white' : colors.foreground,
               }}
             >
@@ -193,7 +219,7 @@ export default function CallHistoryScreen() {
               {f === 'outgoing' && 'Исходящие'}
               {f === 'missed' && 'Пропущенные'}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
 
@@ -221,12 +247,15 @@ export default function CallHistoryScreen() {
 
       {/* Clear history button */}
       {callHistory.length > 0 && !isLoading && (
-        <TouchableOpacity
-          onPress={handleClearHistory}
-          className="mx-4 my-4 py-3 px-4 bg-error rounded-lg items-center"
-        >
-          <Text className="text-sm font-semibold text-white">Очистить историю</Text>
-        </TouchableOpacity>
+        <View style={{ marginHorizontal: 16, marginVertical: 16 }}>
+          <PressableButton
+            label="Очистить историю"
+            variant="danger"
+            size="medium"
+            onPress={handleClearHistory}
+            showGlow={true}
+          />
+        </View>
       )}
     </ScreenContainer>
   );

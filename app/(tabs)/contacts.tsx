@@ -3,16 +3,18 @@ import {
   View,
   Text,
   FlatList,
-  TouchableOpacity,
   TextInput,
   Image,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
 import { UserPresenceService } from "@/lib/user-presence-service";
+import { PressableButton } from "@/components/pressable-button";
+import { PressableListItem } from "@/components/pressable-list-item";
 
 interface Contact {
   id: string;
@@ -94,39 +96,68 @@ export default function ContactsScreen() {
   }, [searchQuery, contacts]);
 
   const renderContactItem = ({ item }: { item: Contact }) => (
-    <TouchableOpacity
+    <PressableListItem
       onPress={() => {
         // Start a new chat with this contact
       }}
-      className="flex-row items-center gap-3 px-4 py-3 border-b border-border"
+      leftIcon={
+        <View style={{ position: 'relative' }}>
+          <Image source={{ uri: item.avatar }} style={{ width: 40, height: 40, borderRadius: 20 }} />
+          {item.isOnline && (
+            <View style={{
+              position: 'absolute',
+              bottom: 0,
+              right: 0,
+              width: 12,
+              height: 12,
+              backgroundColor: colors.success,
+              borderRadius: 6,
+              borderWidth: 2,
+              borderColor: colors.background,
+            }} />
+          )}
+        </View>
+      }
+      rightIcon={
+        <Pressable
+          onPress={() => {
+            // Start call
+          }}
+          style={({ pressed }) => [{
+            backgroundColor: colors.primary,
+            borderRadius: 20,
+            width: 40,
+            height: 40,
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: pressed ? 0.8 : 1,
+            shadowColor: colors.primary,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: pressed ? 0.4 : 0.1,
+            shadowRadius: 4,
+            elevation: pressed ? 8 : 2,
+          }]}
+        >
+          <IconSymbol name="phone.fill" size={18} color="white" />
+        </Pressable>
+      }
+      showGlow={true}
     >
-      <View className="relative">
-        <Image source={{ uri: item.avatar }} className="w-12 h-12 rounded-full" />
-        {item.isOnline && (
-          <View className="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-background" />
-        )}
+      <View style={{ flex: 1, gap: 4 }}>
+        <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground }}>
+          {item.name}
+        </Text>
+        <Text style={{ fontSize: 12, color: colors.muted }}>
+          {item.status}
+        </Text>
       </View>
-
-      <View className="flex-1 gap-1">
-        <Text className="text-base font-semibold text-foreground">{item.name}</Text>
-        <Text className="text-xs text-muted">{item.status}</Text>
-      </View>
-
-      <TouchableOpacity
-        onPress={() => {
-          // Start call
-        }}
-        className="bg-primary rounded-full w-10 h-10 items-center justify-center"
-      >
-        <IconSymbol name="phone.fill" size={18} color="white" />
-      </TouchableOpacity>
-    </TouchableOpacity>
+    </PressableListItem>
   );
 
   return (
     <ScreenContainer className="flex-1 gap-4" edges={["top", "left", "right"]}>
       <View className="px-4 pt-4 gap-4">
-        <Text className="text-2xl font-bold text-foreground">Contacts</Text>
+        <Text className="text-2xl font-bold text-foreground">Контакты</Text>
 
         <View className="flex-row items-center gap-2 bg-surface border border-border rounded-lg px-3 py-2">
           <IconSymbol name="magnifyingglass" size={18} color={colors.muted} />
