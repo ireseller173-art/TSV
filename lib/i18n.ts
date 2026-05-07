@@ -96,6 +96,10 @@ export const translations = {
     'contacts.unblockAction': 'Unblock',
     'contacts.favoriteStatus': 'Favorite',
     'contacts.blockedStatus': 'Blocked',
+    'contacts.loadError': 'Failed to load contacts',
+    'contacts.updateFavoriteError': 'Failed to update favorite',
+    'contacts.updateBlockError': 'Failed to update block status',
+    'contacts.removeError': 'Failed to remove contact',
 
     // Profile
     'profile.title': 'Profile',
@@ -124,20 +128,31 @@ export const translations = {
     'profile.helpSupport': 'Help & Support',
     'profile.aboutLabel': 'About',
     'profile.signOut': 'Sign Out',
+    'profile.nameRequired': 'Name is required',
+    'profile.profileUpdated': 'Profile updated successfully',
+    'profile.failedLoadProfile': 'Failed to load profile',
+    'profile.failedPickImage': 'Failed to pick image',
+    'profile.failedSaveProfile': 'Failed to save profile',
 
     // Calls
     'call.incoming': 'Incoming Call',
     'call.outgoing': 'Outgoing Call',
     'call.accept': 'Accept',
     'call.reject': 'Reject',
+    'call.decline': 'Decline',
     'call.end': 'End Call',
+    'call.endCall': 'End Call',
     'call.mute': 'Mute',
     'call.unmute': 'Unmute',
     'call.speaker': 'Speaker',
+    'call.video': 'Video',
     'call.duration': 'Duration',
     'call.missed': 'Missed Call',
     'call.history': 'Call History',
     'call.noHistory': 'No call history',
+    'call.errorInitiating': 'Error initiating call',
+    'call.errorAccepting': 'Error accepting call',
+    'call.errorEnding': 'Error ending call',
 
     // Notifications
     'notification.newMessage': 'New message from',
@@ -180,6 +195,7 @@ export const translations = {
     'common.cancel': 'Cancel',
     'common.save': 'Save',
     'common.delete': 'Delete',
+    'common.remove': 'Remove',
     'common.edit': 'Edit',
     'common.close': 'Close',
     'common.loading': 'Loading...',
@@ -196,7 +212,8 @@ export const translations = {
     'common.more': 'More',
     'common.less': 'Less',
     'common.confirm': 'Confirm',
-    
+    'common.done': 'Done',
+
     // File Picker
     'filePicker.selectFile': 'Select File',
     'filePicker.photoGallery': 'Photo Gallery',
@@ -215,7 +232,7 @@ export const translations = {
     'filePicker.failedVideo': 'Failed to pick video',
     'filePicker.documentComingSoon': 'Document selection feature coming soon',
     'filePicker.audioComingSoon': 'Audio selection feature coming soon',
-    
+
     // Group Info
     'group.info': 'Group Info',
     'group.name': 'Group Name',
@@ -232,10 +249,7 @@ export const translations = {
     'group.unmuteNotifications': 'Unmute Notifications',
     'group.archiveGroup': 'Archive Group',
     'group.unarchiveGroup': 'Unarchive Group',
-    'group.edit': 'Edit',
-    'group.cancel': 'Cancel',
     'group.save': 'Save',
-    'group.close': 'Close',
     'group.nameEmpty': 'Group name cannot be empty',
     'group.updateSuccess': 'Group updated successfully',
     'group.updateError': 'Failed to update group',
@@ -245,6 +259,139 @@ export const translations = {
     'group.muteSuccess': 'Notifications muted',
     'group.unmuteSuccess': 'Notifications unmuted',
     'group.muteError': 'Failed to toggle mute',
+    'group.confirmRemove': 'Confirm',
+    'group.confirmRemoveMember': 'Remove this member?',
+    'group.leaveGroup': 'Leave Group',
+    'group.confirmLeaveGroup': 'Are you sure you want to leave this group?',
+    'group.deleteGroup': 'Delete Group',
+    'group.confirmDeleteGroup': 'This action cannot be undone.',
+    'group.you': 'You',
+    'group.admin': 'Admin',
+    'group.member': 'Member',
+    'group.promote': 'Promote to Admin',
+    'group.demote': 'Demote to Member',
+    'group.removeMember': 'Remove Member',
+    'group.leaveAction': 'Leave',
+    'group.deleteAction': 'Delete',
+    'group.errorLoadingGroup': 'Error loading group details',
+    'group.errorRemovingMember': 'Error removing member',
+    'group.errorPromotingMember': 'Error promoting member',
+    'group.errorDemotingMember': 'Error demoting member',
+    'group.errorLeavingGroup': 'Error leaving group',
+    'group.errorDeletingGroup': 'Error deleting group',
+
+    // Voice Message Recorder
+    'voice.title': 'Voice Message',
+    'voice.startRecording': 'Start Recording',
+    'voice.stopRecording': 'Stop Recording',
+    'voice.sendVoiceMessage': 'Send Voice Message',
+    'voice.cancelRecording': 'Cancel',
+    'voice.failedInitAudio': 'Failed to initialize audio',
+    'voice.failedStartRecording': 'Failed to start recording',
+    'voice.failedStopRecording': 'Failed to stop recording',
+    'voice.failedSendMessage': 'Failed to send voice message',
+    'voice.missingData': 'Missing required data',
+
+    // Message Search
+    'search.title': 'Search Messages',
+    'search.placeholder': 'Search...',
+    'search.noResults': 'No messages found',
+    'search.searching': 'Searching...',
+    'search.errorSearching': 'Error searching messages',
+
+    // Pinned Messages
+    'pinned.title': 'Pinned Messages',
+    'pinned.noPinned': 'No pinned messages',
+    'pinned.unpin': 'Unpin',
+    'pinned.errorUnpinning': 'Error unpinning message',
+
+    // Send Invitation
+    'invitation.title': 'Send Invitation',
+    'invitation.link': 'Invitation Link',
+    'invitation.copy': 'Copy Link',
+    'invitation.copied': 'Copied',
+    'invitation.share': 'Share',
+    'invitation.errorGenerating': 'Error generating invitation',
+
+    // Accept Invitation
+    'invitation.accept': 'Accept Invitation',
+    'invitation.joining': 'Joining group...',
+    'invitation.joined': 'Successfully joined group',
+    'invitation.errorJoining': 'Error joining group',
+    'invitation.invalidLink': 'Invalid invitation link',
+
+    // Call History
+    'calls.title': 'Call History',
+    'calls.incoming': 'Incoming',
+    'calls.outgoing': 'Outgoing',
+    'calls.missed': 'Missed',
+    'calls.duration': 'Duration',
+    'calls.clearHistory': 'Clear History',
+    'calls.deleteCall': 'Delete Call',
+    'calls.confirmClearHistory': 'Clear all call history?',
+    'calls.confirmDeleteCall': 'Delete this call?',
+    'calls.errorLoadingHistory': 'Error loading call history',
+    'calls.errorDeletingCall': 'Error deleting call',
+    'calls.errorClearingHistory': 'Error clearing history',
+
+    // Sound Settings
+    'sound.title': 'Sound Settings',
+    'sound.notification': 'Notification Sound',
+    'sound.ringtone': 'Ringtone',
+    'sound.vibration': 'Vibration',
+    'sound.preview': 'Preview',
+    'sound.errorChanging': 'Error changing sound',
+
+    // Contact Sync
+    'sync.title': 'Sync Contacts',
+    'sync.syncing': 'Syncing contacts...',
+    'sync.synced': 'Contacts synced',
+    'sync.errorSyncing': 'Error syncing contacts',
+    'sync.permission': 'Permission required to sync contacts',
+
+    // Notification Preferences
+    'notif.title': 'Notification Preferences',
+    'notif.messages': 'Message Notifications',
+    'notif.calls': 'Call Notifications',
+    'notif.groups': 'Group Notifications',
+    'notif.sound': 'Sound',
+    'notif.vibration': 'Vibration',
+    'notif.preview': 'Preview',
+    'notif.errorSaving': 'Error saving preferences',
+
+    // New Chat
+    'newChat.title': 'New Chat',
+    'newChat.selectContact': 'Select a contact',
+    'newChat.noContacts': 'No contacts available',
+    'newChat.errorCreating': 'Error creating chat',
+
+    // Groups
+    'groups.title': 'Groups',
+    'groups.create': 'Create Group',
+    'groups.noGroups': 'No groups yet',
+    'groups.errorLoading': 'Error loading groups',
+
+    // Contacts Tab
+    'contactsTab.title': 'Contacts',
+    'contactsTab.add': 'Add Contact',
+    'contactsTab.noContacts': 'No contacts',
+    'contactsTab.errorLoading': 'Error loading contacts',
+
+    // Notes Tab
+    'notesTab.title': 'Notes',
+    'notesTab.create': 'Create Note',
+    'notesTab.noNotes': 'No notes yet',
+    'notesTab.errorLoading': 'Error loading notes',
+
+    // Chats Tab
+    'chatsTab.title': 'Chats',
+    'chatsTab.archive': 'Archive',
+    'chatsTab.unarchive': 'Unarchive',
+    'chatsTab.delete': 'Delete',
+    'chatsTab.confirmDelete': 'Delete this chat?',
+    'chatsTab.errorLoading': 'Error loading chats',
+    'chatsTab.errorArchiving': 'Error archiving chat',
+    'chatsTab.errorDeleting': 'Error deleting chat',
   },
 
   ru: {
@@ -283,8 +430,8 @@ export const translations = {
     'chat.messageDeleted': 'Сообщение удалено',
     'chat.messageEdited': '(отредактировано)',
     'chat.typing': 'печатает...',
-    'chat.online': 'В сети',
-    'chat.offline': 'Не в сети',
+    'chat.online': 'Онлайн',
+    'chat.offline': 'Оффлайн',
     'chat.lastSeen': 'Последний раз',
     'chat.deliveryStatus.sending': 'Отправка...',
     'chat.deliveryStatus.sent': 'Отправлено',
@@ -301,10 +448,10 @@ export const translations = {
     'chat.unmute': 'Включить звук',
     'chat.archive': 'Архивировать',
     'chat.messages': 'Сообщения',
-    'chat.searchConversations': 'Поиск диалогов',
-    'chat.noChats': 'Диалогов нет',
-    'chat.startChatting': 'Начать чат',
-    'chat.noMessages': 'Сообщений нет',
+    'chat.searchConversations': 'Поиск разговоров',
+    'chat.noChats': 'Нет разговоров',
+    'chat.startChatting': 'Начните общение',
+    'chat.noMessages': 'Нет сообщений',
     'chat.startConversation': 'Начните разговор!',
 
     // Contacts
@@ -334,6 +481,10 @@ export const translations = {
     'contacts.unblockAction': 'Разблокировать',
     'contacts.favoriteStatus': 'Избранное',
     'contacts.blockedStatus': 'Заблокированные',
+    'contacts.loadError': 'Не удалось загрузить контакты',
+    'contacts.updateFavoriteError': 'Не удалось обновить избранное',
+    'contacts.updateBlockError': 'Не удалось обновить статус блокировки',
+    'contacts.removeError': 'Не удалось удалить контакт',
 
     // Profile
     'profile.title': 'Профиль',
@@ -346,36 +497,47 @@ export const translations = {
     'profile.changeAvatar': 'Изменить аватар',
     'profile.logout': 'Выход',
     'profile.settings': 'Настройки',
-    'profile.privacy': 'Конфиденциальность',
+    'profile.privacy': 'Приватность',
     'profile.notifications': 'Уведомления',
     'profile.language': 'Язык',
     'profile.theme': 'Тема',
     'profile.about': 'О приложении',
-    'profile.online': 'В сети',
-    'profile.offline': 'Не в сети',
+    'profile.online': 'Онлайн',
+    'profile.offline': 'Оффлайн',
     'profile.statusLabel': 'Статус',
     'profile.settingsLabel': 'Настройки',
     'profile.notificationsLabel': 'Уведомления',
-    'profile.darkMode': 'Темный режим',
-    'profile.privacySecurity': 'Конфиденциальность и безопасность',
+    'profile.darkMode': 'Тёмный режим',
+    'profile.privacySecurity': 'Приватность и безопасность',
     'profile.callHistoryLabel': 'История звонков',
     'profile.helpSupport': 'Помощь и поддержка',
     'profile.aboutLabel': 'О приложении',
     'profile.signOut': 'Выход',
+    'profile.nameRequired': 'Имя обязательно',
+    'profile.profileUpdated': 'Профиль успешно обновлён',
+    'profile.failedLoadProfile': 'Не удалось загрузить профиль',
+    'profile.failedPickImage': 'Не удалось выбрать изображение',
+    'profile.failedSaveProfile': 'Не удалось сохранить профиль',
 
     // Calls
     'call.incoming': 'Входящий звонок',
     'call.outgoing': 'Исходящий звонок',
     'call.accept': 'Принять',
     'call.reject': 'Отклонить',
+    'call.decline': 'Отклонить',
     'call.end': 'Завершить звонок',
-    'call.mute': 'Отключить звук',
-    'call.unmute': 'Включить звук',
-    'call.speaker': 'Динамик',
+    'call.endCall': 'Завершить звонок',
+    'call.mute': 'Отключить микрофон',
+    'call.unmute': 'Включить микрофон',
+    'call.speaker': 'Громкая связь',
+    'call.video': 'Видео',
     'call.duration': 'Длительность',
     'call.missed': 'Пропущенный звонок',
     'call.history': 'История звонков',
     'call.noHistory': 'История звонков пуста',
+    'call.errorInitiating': 'Ошибка при инициировании звонка',
+    'call.errorAccepting': 'Ошибка при принятии звонка',
+    'call.errorEnding': 'Ошибка при завершении звонка',
 
     // Notifications
     'notification.newMessage': 'Новое сообщение от',
@@ -384,25 +546,11 @@ export const translations = {
     'notification.enable': 'Включить уведомления',
     'notification.disable': 'Отключить уведомления',
 
-    // Notes
-    'notes.title': 'Заметки',
-    'notes.new': 'Новая заметка',
-    'notes.edit': 'Редактировать заметку',
-    'notes.delete': 'Удалить заметку',
-    'notes.search': 'Поиск заметок',
-    'notes.empty': 'Заметок нет',
-    'notes.label_title': 'Заголовок',
-    'notes.label_content': 'Содержание',
-    'notes.label_date': 'Дата (YYYY-MM-DD)',
-    'notes.label_time': 'Время (HH:mm)',
-    'notes.error_empty': 'Заголовок и содержание не могут быть пустыми',
-    'notes.error_save': 'Ошибка при сохранении заметки',
-
     // Settings
     'settings.title': 'Настройки',
     'settings.account': 'Аккаунт',
     'settings.security': 'Безопасность',
-    'settings.privacy': 'Конфиденциальность',
+    'settings.privacy': 'Приватность',
     'settings.notifications': 'Уведомления',
     'settings.language': 'Язык',
     'settings.theme': 'Тема',
@@ -411,6 +559,20 @@ export const translations = {
     'settings.help': 'Помощь',
     'settings.feedback': 'Отправить отзыв',
 
+    // Notes
+    'notes.title': 'Заметки',
+    'notes.new': 'Новая заметка',
+    'notes.edit': 'Редактировать заметку',
+    'notes.delete': 'Удалить заметку',
+    'notes.search': 'Поиск заметок',
+    'notes.empty': 'Заметок нет',
+    'notes.label_title': 'Название',
+    'notes.label_content': 'Содержание',
+    'notes.label_date': 'Дата (YYYY-MM-DD)',
+    'notes.label_time': 'Время (HH:mm)',
+    'notes.error_empty': 'Название и содержание не могут быть пустыми',
+    'notes.error_save': 'Ошибка при сохранении заметки',
+
     // Common
     'common.yes': 'Да',
     'common.no': 'Нет',
@@ -418,6 +580,7 @@ export const translations = {
     'common.cancel': 'Отмена',
     'common.save': 'Сохранить',
     'common.delete': 'Удалить',
+    'common.remove': 'Удалить',
     'common.edit': 'Редактировать',
     'common.close': 'Закрыть',
     'common.loading': 'Загрузка...',
@@ -434,7 +597,8 @@ export const translations = {
     'common.more': 'Ещё',
     'common.less': 'Меньше',
     'common.confirm': 'Подтвердить',
-    
+    'common.done': 'Готово',
+
     // File Picker
     'filePicker.selectFile': 'Выбрать файл',
     'filePicker.photoGallery': 'Галерея фото',
@@ -453,7 +617,7 @@ export const translations = {
     'filePicker.failedVideo': 'Не удалось выбрать видео',
     'filePicker.documentComingSoon': 'Выбор документов скоро будет доступен',
     'filePicker.audioComingSoon': 'Выбор аудио скоро будет доступен',
-    
+
     // Group Info
     'group.info': 'Информация о группе',
     'group.name': 'Название группы',
@@ -470,10 +634,7 @@ export const translations = {
     'group.unmuteNotifications': 'Включить уведомления',
     'group.archiveGroup': 'Архивировать группу',
     'group.unarchiveGroup': 'Вывести из архива',
-    'group.edit': 'Редактировать',
-    'group.cancel': 'Отмена',
     'group.save': 'Сохранить',
-    'group.close': 'Закрыть',
     'group.nameEmpty': 'Название группы не может быть пустым',
     'group.updateSuccess': 'Группа успешно обновлена',
     'group.updateError': 'Не удалось обновить группу',
@@ -483,6 +644,139 @@ export const translations = {
     'group.muteSuccess': 'Уведомления отключены',
     'group.unmuteSuccess': 'Уведомления включены',
     'group.muteError': 'Не удалось изменить статус уведомлений',
+    'group.confirmRemove': 'Подтвердить',
+    'group.confirmRemoveMember': 'Удалить этого члена?',
+    'group.leaveGroup': 'Выйти из группы',
+    'group.confirmLeaveGroup': 'Вы уверены, что хотите выйти из этой группы?',
+    'group.deleteGroup': 'Удалить группу',
+    'group.confirmDeleteGroup': 'Это действие нельзя отменить.',
+    'group.you': 'Вы',
+    'group.admin': 'Администратор',
+    'group.member': 'Член',
+    'group.promote': 'Сделать администратором',
+    'group.demote': 'Сделать членом',
+    'group.removeMember': 'Удалить члена',
+    'group.leaveAction': 'Выйти',
+    'group.deleteAction': 'Удалить',
+    'group.errorLoadingGroup': 'Ошибка при загрузке информации о группе',
+    'group.errorRemovingMember': 'Ошибка при удалении члена',
+    'group.errorPromotingMember': 'Ошибка при повышении члена',
+    'group.errorDemotingMember': 'Ошибка при понижении члена',
+    'group.errorLeavingGroup': 'Ошибка при выходе из группы',
+    'group.errorDeletingGroup': 'Ошибка при удалении группы',
+
+    // Voice Message Recorder
+    'voice.title': 'Голосовое сообщение',
+    'voice.startRecording': 'Начать запись',
+    'voice.stopRecording': 'Остановить запись',
+    'voice.sendVoiceMessage': 'Отправить голосовое сообщение',
+    'voice.cancelRecording': 'Отмена',
+    'voice.failedInitAudio': 'Не удалось инициировать аудио',
+    'voice.failedStartRecording': 'Не удалось начать запись',
+    'voice.failedStopRecording': 'Не удалось остановить запись',
+    'voice.failedSendMessage': 'Не удалось отправить голосовое сообщение',
+    'voice.missingData': 'Отсутствуют необходимые данные',
+
+    // Message Search
+    'search.title': 'Поиск сообщений',
+    'search.placeholder': 'Поиск...',
+    'search.noResults': 'Сообщения не найдены',
+    'search.searching': 'Поиск...',
+    'search.errorSearching': 'Ошибка при поиске сообщений',
+
+    // Pinned Messages
+    'pinned.title': 'Закреплённые сообщения',
+    'pinned.noPinned': 'Нет закреплённых сообщений',
+    'pinned.unpin': 'Открепить',
+    'pinned.errorUnpinning': 'Ошибка при откреплении сообщения',
+
+    // Send Invitation
+    'invitation.title': 'Отправить приглашение',
+    'invitation.link': 'Ссылка приглашения',
+    'invitation.copy': 'Копировать ссылку',
+    'invitation.copied': 'Скопировано',
+    'invitation.share': 'Поделиться',
+    'invitation.errorGenerating': 'Ошибка при создании приглашения',
+
+    // Accept Invitation
+    'invitation.accept': 'Принять приглашение',
+    'invitation.joining': 'Присоединение к группе...',
+    'invitation.joined': 'Успешно присоединились к группе',
+    'invitation.errorJoining': 'Ошибка при присоединении к группе',
+    'invitation.invalidLink': 'Неверная ссылка приглашения',
+
+    // Call History
+    'calls.title': 'История звонков',
+    'calls.incoming': 'Входящие',
+    'calls.outgoing': 'Исходящие',
+    'calls.missed': 'Пропущенные',
+    'calls.duration': 'Длительность',
+    'calls.clearHistory': 'Очистить историю',
+    'calls.deleteCall': 'Удалить звонок',
+    'calls.confirmClearHistory': 'Очистить всю историю звонков?',
+    'calls.confirmDeleteCall': 'Удалить этот звонок?',
+    'calls.errorLoadingHistory': 'Ошибка при загрузке истории звонков',
+    'calls.errorDeletingCall': 'Ошибка при удалении звонка',
+    'calls.errorClearingHistory': 'Ошибка при очистке истории',
+
+    // Sound Settings
+    'sound.title': 'Настройки звука',
+    'sound.notification': 'Звук уведомления',
+    'sound.ringtone': 'Рингтон',
+    'sound.vibration': 'Вибрация',
+    'sound.preview': 'Предпросмотр',
+    'sound.errorChanging': 'Ошибка при изменении звука',
+
+    // Contact Sync
+    'sync.title': 'Синхронизация контактов',
+    'sync.syncing': 'Синхронизация контактов...',
+    'sync.synced': 'Контакты синхронизированы',
+    'sync.errorSyncing': 'Ошибка при синхронизации контактов',
+    'sync.permission': 'Требуется разрешение для синхронизации контактов',
+
+    // Notification Preferences
+    'notif.title': 'Предпочтения уведомлений',
+    'notif.messages': 'Уведомления о сообщениях',
+    'notif.calls': 'Уведомления о звонках',
+    'notif.groups': 'Уведомления о группах',
+    'notif.sound': 'Звук',
+    'notif.vibration': 'Вибрация',
+    'notif.preview': 'Предпросмотр',
+    'notif.errorSaving': 'Ошибка при сохранении предпочтений',
+
+    // New Chat
+    'newChat.title': 'Новый чат',
+    'newChat.selectContact': 'Выберите контакт',
+    'newChat.noContacts': 'Контактов нет',
+    'newChat.errorCreating': 'Ошибка при создании чата',
+
+    // Groups
+    'groups.title': 'Группы',
+    'groups.create': 'Создать группу',
+    'groups.noGroups': 'Групп нет',
+    'groups.errorLoading': 'Ошибка при загрузке групп',
+
+    // Contacts Tab
+    'contactsTab.title': 'Контакты',
+    'contactsTab.add': 'Добавить контакт',
+    'contactsTab.noContacts': 'Контактов нет',
+    'contactsTab.errorLoading': 'Ошибка при загрузке контактов',
+
+    // Notes Tab
+    'notesTab.title': 'Заметки',
+    'notesTab.create': 'Создать заметку',
+    'notesTab.noNotes': 'Заметок нет',
+    'notesTab.errorLoading': 'Ошибка при загрузке заметок',
+
+    // Chats Tab
+    'chatsTab.title': 'Чаты',
+    'chatsTab.archive': 'Архивировать',
+    'chatsTab.unarchive': 'Вывести из архива',
+    'chatsTab.delete': 'Удалить',
+    'chatsTab.confirmDelete': 'Удалить этот чат?',
+    'chatsTab.errorLoading': 'Ошибка при загрузке чатов',
+    'chatsTab.errorArchiving': 'Ошибка при архивировании чата',
+    'chatsTab.errorDeleting': 'Ошибка при удалении чата',
   },
 };
 
@@ -516,7 +810,7 @@ export function formatMessage(
 /**
  * Get all translations for a language
  */
-export function getLanguageTranslations(language: Language): Record<string, string> {
+export function getLanguageTranslations(language: Language) {
   return translations[language];
 }
 
