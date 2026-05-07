@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getDatabase, ref, set, get, onValue, off } from 'firebase/database';
+import { getAuth } from 'firebase/auth';
 
 export interface UserPresence {
   userId: string;
