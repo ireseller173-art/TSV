@@ -118,6 +118,20 @@ export const translations = {
     'settings.help': 'Help',
     'settings.feedback': 'Send Feedback',
 
+    // Notes
+    'notes.title': 'Notes',
+    'notes.new': 'New Note',
+    'notes.edit': 'Edit Note',
+    'notes.delete': 'Delete Note',
+    'notes.search': 'Search notes',
+    'notes.empty': 'No notes yet',
+    'notes.label_title': 'Title',
+    'notes.label_content': 'Content',
+    'notes.label_date': 'Date (YYYY-MM-DD)',
+    'notes.label_time': 'Time (HH:mm)',
+    'notes.error_empty': 'Title and content cannot be empty',
+    'notes.error_save': 'Error saving note',
+
     // Common
     'common.yes': 'Yes',
     'common.no': 'No',
@@ -237,6 +251,20 @@ export const translations = {
     'notification.missedCall': 'Пропущенный звонок от',
     'notification.enable': 'Включить уведомления',
     'notification.disable': 'Отключить уведомления',
+
+    // Notes
+    'notes.title': 'Заметки',
+    'notes.new': 'Новая заметка',
+    'notes.edit': 'Редактировать заметку',
+    'notes.delete': 'Удалить заметку',
+    'notes.search': 'Поиск заметок',
+    'notes.empty': 'Заметок нет',
+    'notes.label_title': 'Заголовок',
+    'notes.label_content': 'Содержание',
+    'notes.label_date': 'Дата (YYYY-MM-DD)',
+    'notes.label_time': 'Время (HH:mm)',
+    'notes.error_empty': 'Заголовок и содержание не могут быть пустыми',
+    'notes.error_save': 'Ошибка при сохранении заметки',
 
     // Settings
     'settings.title': 'Настройки',

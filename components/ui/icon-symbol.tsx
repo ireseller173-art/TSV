@@ -31,6 +31,7 @@ const MAPPING = {
   "magnifyingglass": "search",
   "gear": "settings",
   "arrow.left": "arrow-back",
+  "note.text": "note",
 } as unknown as IconMapping;
 
 /**
