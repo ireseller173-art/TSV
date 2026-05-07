@@ -149,3 +149,29 @@
 - [ ] Prepare for app store submission
 - [ ] Final QA and bug fixes
 - [ ] Create checkpoint for delivery
+
+## Phase 12: Avatar & Profile Management
+- [x] Create avatar upload service
+- [x] Generate default neutral gray/white profile avatars
+- [x] Implement avatar display in profile
+- [ ] Add avatar cropping/editing
+- [ ] Store avatars in Firebase Storage
+- [ ] Cache avatars locally
+
+## Phase 13: Sound Notifications
+- [x] Create sound management service
+- [x] Add sound picker for message notifications
+- [x] Add sound picker for call notifications
+- [x] Add sound picker for incoming call ringtone
+- [x] Add sound picker for outgoing message tone
+- [x] Implement sound preview/test
+- [x] Store user sound preferences
+- [x] Add volume control
+
+## Phase 14: Firebase Deployment Guide (Russian)
+- [x] Create detailed Russian installation guide
+- [x] Document all requirements and dependencies
+- [x] Add step-by-step Firebase setup
+- [x] Include program installation instructions
+- [x] Add troubleshooting section
+- [ ] Create video tutorial references
