@@ -14,6 +14,7 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
 import { useAuth } from "@/lib/auth-provider";
 import { useI18n } from "@/hooks/use-i18n";
+import { ChatContextMenu } from "@/components/chat-context-menu";
 
 interface Chat {
   id: string;
@@ -34,6 +35,10 @@ export default function ChatsScreen() {
   const [filteredChats, setFilteredChats] = useState<Chat[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [pinnedChats, setPinnedChats] = useState<Set<string>>(new Set());
+  const [mutedChats, setMutedChats] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const mockChats: Chat[] = [
@@ -81,6 +86,38 @@ export default function ChatsScreen() {
     }
   }, [searchQuery, chats]);
 
+  const handlePinChat = () => {
+    if (!selectedChatId) return;
+    const newPinned = new Set(pinnedChats);
+    if (newPinned.has(selectedChatId)) {
+      newPinned.delete(selectedChatId);
+    } else {
+      newPinned.add(selectedChatId);
+    }
+    setPinnedChats(newPinned);
+  };
+
+  const handleMuteChat = () => {
+    if (!selectedChatId) return;
+    const newMuted = new Set(mutedChats);
+    if (newMuted.has(selectedChatId)) {
+      newMuted.delete(selectedChatId);
+    } else {
+      newMuted.add(selectedChatId);
+    }
+    setMutedChats(newMuted);
+  };
+
+  const handleDeleteChat = () => {
+    if (!selectedChatId) return;
+    setChats(chats.filter((c) => c.id !== selectedChatId));
+  };
+
+  const handleArchiveChat = () => {
+    if (!selectedChatId) return;
+    console.log('Archive chat:', selectedChatId);
+  };
+
   const renderChatItem = ({ item }: { item: Chat }) => (
     <TouchableOpacity
       onPress={() => {
@@ -93,6 +130,10 @@ export default function ChatsScreen() {
             isGroup: item.isGroup ? "true" : "false",
           },
         });
+      }}
+      onLongPress={() => {
+        setSelectedChatId(item.id);
+        setShowContextMenu(true);
       }}
       className="flex-row items-center gap-3 px-4 py-3 border-b border-border"
     >
@@ -169,6 +210,20 @@ export default function ChatsScreen() {
           renderItem={renderChatItem}
           keyExtractor={(item) => item.id}
           scrollEnabled={true}
+        />
+      )}
+
+      {/* Chat Context Menu */}
+      {selectedChatId && (
+        <ChatContextMenu
+          visible={showContextMenu}
+          onClose={() => setShowContextMenu(false)}
+          onPin={handlePinChat}
+          onMute={handleMuteChat}
+          onDelete={handleDeleteChat}
+          onArchive={handleArchiveChat}
+          isPinned={pinnedChats.has(selectedChatId)}
+          isMuted={mutedChats.has(selectedChatId)}
         />
       )}
     </ScreenContainer>

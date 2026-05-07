@@ -32,12 +32,16 @@ export default function ChatDetailScreen() {
   const colors = useColors();
   const { user } = useAuth();
   const { t } = useI18n();
-  const { chatId = "1", chatName = "Chat" } = useLocalSearchParams<{
-    chatId: string;
-    chatName: string;
+  const { chatId = "1", chatName = "Chat", groupId } = useLocalSearchParams<{
+    chatId?: string;
+    chatName?: string;
+    groupId?: string;
   }>();
+  
+  // Use groupId if provided, otherwise use chatId
+  const currentChatId = groupId || chatId;
 
-  const { messages, sendMessage, addReaction } = useChat(chatId);
+  const { messages, sendMessage, addReaction } = useChat(currentChatId);
   const [messageText, setMessageText] = useState("");
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
@@ -66,7 +70,7 @@ export default function ChatDetailScreen() {
       const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const storedMessage: StoredMessage = {
         id: messageId,
-        chatId,
+        chatId: currentChatId,
         senderId: user.id,
         senderName: user.name,
         text: messageText.trim(),
