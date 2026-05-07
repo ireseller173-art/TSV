@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getFirestore, collection, doc, setDoc, getDoc, query, where, getDocs, deleteDoc, writeBatch } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 export interface UserProfile {
   id: string;
@@ -50,6 +52,15 @@ export class UserProfileService {
 
       // Add to all users list
       await this.addToUsersList(updated);
+      
+      // Save to Firebase Firestore
+      try {
+        const db = getFirestore();
+        const userRef = doc(db, 'users', profile.id);
+        await setDoc(userRef, updated, { merge: true });
+      } catch (firebaseError) {
+        console.warn('Firebase save failed, using local storage:', firebaseError);
+      }
 
       return updated;
     } catch (error) {
@@ -63,6 +74,22 @@ export class UserProfileService {
    */
   static async getProfile(userId: string): Promise<UserProfile | null> {
     try {
+      // Try Firebase first
+      try {
+        const db = getFirestore();
+        const userRef = doc(db, 'users', userId);
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data() as UserProfile;
+          // Cache in AsyncStorage
+          await AsyncStorage.setItem(`${USER_PROFILE_KEY}_${userId}`, JSON.stringify(data));
+          return data;
+        }
+      } catch (firebaseError) {
+        console.warn('Firebase get failed, using local storage:', firebaseError);
+      }
+      
+      // Fall back to AsyncStorage
       const profileJson = await AsyncStorage.getItem(`${USER_PROFILE_KEY}_${userId}`);
       return profileJson ? JSON.parse(profileJson) : null;
     } catch (error) {
