@@ -50,6 +50,8 @@
 - [x] Implement video message support
 - [x] Create media preview before sending
 - [x] Add image compression and optimization
+- [x] Implement typing indicators ("User is typing...")
+- [x] Add message read receipts (delivered, read)
 - [ ] Implement message forwarding
 - [ ] Add message search functionality
 - [ ] Create pinned messages feature
