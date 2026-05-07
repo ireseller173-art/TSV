@@ -18,6 +18,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/use-colors';
+import { useI18n } from '@/hooks/use-i18n';
 import { cn } from '@/lib/utils';
 import { FileMetadata, FilePickerOptions, FilePickerResult } from '@/lib/types/file-sharing';
 import { validateFile } from '@/lib/file-sharing-service';
@@ -36,6 +37,7 @@ export function FilePickerModal({
   options = {},
 }: FilePickerModalProps) {
   const colors = useColors();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
 
   const {
@@ -80,7 +82,7 @@ export function FilePickerModal({
         for (const file of files) {
           const validation = validateFile(file);
           if (!validation.valid) {
-            Alert.alert('Invalid File', validation.errors[0]);
+            Alert.alert(t('filePicker.invalidFile'), validation.errors[0]);
           } else {
             validFiles.push(file);
           }
@@ -96,11 +98,11 @@ export function FilePickerModal({
       }
     } catch (error) {
       console.error('Failed to pick image:', error);
-      Alert.alert('Error', 'Failed to pick image');
+      Alert.alert(t('filePicker.error'), t('filePicker.failedImage'));
     } finally {
       setLoading(false);
     }
-  }, [allowMultiple, onFilesSelected, onClose]);
+  }, [allowMultiple, onFilesSelected, onClose, t]);
 
   /**
    * Take photo with camera
@@ -132,7 +134,7 @@ export function FilePickerModal({
 
         const validation = validateFile(file);
         if (!validation.valid) {
-          Alert.alert('Invalid File', validation.errors[0]);
+          Alert.alert(t('filePicker.invalidFile'), validation.errors[0]);
         } else {
           onFilesSelected({
             files: [file],
@@ -143,11 +145,11 @@ export function FilePickerModal({
       }
     } catch (error) {
       console.error('Failed to take photo:', error);
-      Alert.alert('Error', 'Failed to take photo');
+      Alert.alert(t('filePicker.error'), t('filePicker.failedPhoto'));
     } finally {
       setLoading(false);
     }
-  }, [onFilesSelected, onClose]);
+  }, [onFilesSelected, onClose, t]);
 
   /**
    * Pick document
@@ -158,14 +160,14 @@ export function FilePickerModal({
 
       // Document picker would be called here
       // For now, showing alert
-      Alert.alert('Document Picker', 'Document selection feature coming soon');
+      Alert.alert(t('filePicker.document'), t('filePicker.documentComingSoon'));
     } catch (error) {
       console.error('Failed to pick document:', error);
-      Alert.alert('Error', 'Failed to pick document');
+      Alert.alert(t('filePicker.error'), t('filePicker.failedDocument'));
     } finally {
       setLoading(false);
     }
-  }, [allowMultiple, onFilesSelected, onClose]);
+  }, [allowMultiple, onFilesSelected, onClose, t]);
 
   /**
    * Pick audio
@@ -176,14 +178,14 @@ export function FilePickerModal({
 
       // Audio picker would be called here
       // For now, showing alert
-      Alert.alert('Audio Picker', 'Audio selection feature coming soon');
+      Alert.alert(t('filePicker.audio'), t('filePicker.audioComingSoon'));
     } catch (error) {
       console.error('Failed to pick audio:', error);
-      Alert.alert('Error', 'Failed to pick audio');
+      Alert.alert(t('filePicker.error'), t('filePicker.failedAudio'));
     } finally {
       setLoading(false);
     }
-  }, [allowMultiple, onFilesSelected, onClose]);
+  }, [allowMultiple, onFilesSelected, onClose, t]);
 
   /**
    * Pick video
@@ -219,7 +221,7 @@ export function FilePickerModal({
         for (const file of files) {
           const validation = validateFile(file);
           if (!validation.valid) {
-            Alert.alert('Invalid File', validation.errors[0]);
+            Alert.alert(t('filePicker.invalidFile'), validation.errors[0]);
           } else {
             validFiles.push(file);
           }
@@ -235,44 +237,44 @@ export function FilePickerModal({
       }
     } catch (error) {
       console.error('Failed to pick video:', error);
-      Alert.alert('Error', 'Failed to pick video');
+      Alert.alert(t('filePicker.error'), t('filePicker.failedVideo'));
     } finally {
       setLoading(false);
     }
-  }, [allowMultiple, onFilesSelected, onClose]);
+  }, [allowMultiple, onFilesSelected, onClose, t]);
 
   const options_list = [
     {
       id: 'gallery',
-      label: 'Photo Gallery',
+      label: t('filePicker.photoGallery'),
       icon: 'image',
       action: pickImage,
       visible: fileTypes.includes('image') && allowGallery,
     },
     {
       id: 'camera',
-      label: 'Take Photo',
+      label: t('filePicker.takePhoto'),
       icon: 'camera-alt',
       action: takePhoto,
       visible: fileTypes.includes('image') && allowCamera,
     },
     {
       id: 'document',
-      label: 'Document',
+      label: t('filePicker.document'),
       icon: 'description',
       action: pickDocument,
       visible: fileTypes.includes('document'),
     },
     {
       id: 'audio',
-      label: 'Audio',
+      label: t('filePicker.audio'),
       icon: 'audio-file',
       action: pickAudio,
       visible: fileTypes.includes('audio'),
     },
     {
       id: 'video',
-      label: 'Video',
+      label: t('filePicker.video'),
       icon: 'video-library',
       action: pickVideo,
       visible: fileTypes.includes('video'),
@@ -297,7 +299,7 @@ export function FilePickerModal({
           {/* Header */}
           <View className="flex-row items-center justify-between mb-6">
             <Text className="text-2xl font-bold text-foreground">
-              Select File
+              {t('filePicker.selectFile')}
             </Text>
             <TouchableOpacity onPress={onClose} disabled={loading}>
               <MaterialIcons
@@ -372,8 +374,8 @@ export function FilePickerModal({
               style={{ color: colors.muted }}
             >
               {allowMultiple
-                ? `Select up to ${maxFiles} files`
-                : 'Select one file'}
+                ? t('filePicker.selectMultiple').replace('{count}', String(maxFiles))
+                : t('filePicker.selectOne')}
             </Text>
           </View>
         </View>

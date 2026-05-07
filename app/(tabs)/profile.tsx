@@ -12,11 +12,13 @@ import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
 import { useAuth } from "@/lib/auth-provider";
+import { useI18n } from "@/hooks/use-i18n";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const colors = useColors();
   const { user, signOut } = useAuth();
+  const { t } = useI18n();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkModeEnabled, setDarkModeEnabled] = useState(false);
 
@@ -24,6 +26,11 @@ export default function ProfileScreen() {
     await signOut();
     // @ts-ignore
     router.replace("/(auth)/splash");
+  };
+
+  const handleEditProfile = () => {
+    // @ts-ignore
+    router.push("/profile-edit");
   };
 
   return (
@@ -39,25 +46,31 @@ export default function ProfileScreen() {
             <View className="items-center gap-1">
               <Text className="text-2xl font-bold text-foreground">{user?.name}</Text>
               <Text className="text-sm text-muted">{user?.email}</Text>
-              <Text className="text-xs text-success mt-2">Online</Text>
+              <Text className="text-xs text-success mt-2">{t('profile.online')}</Text>
             </View>
+            <TouchableOpacity
+              onPress={handleEditProfile}
+              className="mt-2 px-6 py-2 bg-primary rounded-full"
+            >
+              <Text className="text-white font-semibold text-sm">{t('profile.edit')}</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Status Section */}
           <View className="bg-surface rounded-lg p-4 gap-2">
-            <Text className="text-xs font-semibold text-muted uppercase">Status</Text>
-            <Text className="text-base text-foreground">{user?.status}</Text>
+            <Text className="text-xs font-semibold text-muted uppercase">{t('profile.statusLabel')}</Text>
+            <Text className="text-base text-foreground">{user?.status || t('profile.online')}</Text>
           </View>
 
           {/* Settings Section */}
           <View className="gap-3">
-            <Text className="text-xs font-semibold text-muted uppercase px-2">Settings</Text>
+            <Text className="text-xs font-semibold text-muted uppercase px-2">{t('profile.settingsLabel')}</Text>
 
             {/* Notifications */}
             <View className="bg-surface rounded-lg p-4 flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">
                 <IconSymbol name="bell.fill" size={20} color={colors.primary} />
-                <Text className="text-base text-foreground">Notifications</Text>
+                <Text className="text-base text-foreground">{t('profile.notificationsLabel')}</Text>
               </View>
               <Switch
                 value={notificationsEnabled}
@@ -70,7 +83,7 @@ export default function ProfileScreen() {
             <View className="bg-surface rounded-lg p-4 flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">
                 <IconSymbol name="moon.fill" size={20} color={colors.primary} />
-                <Text className="text-base text-foreground">Dark Mode</Text>
+                <Text className="text-base text-foreground">{t('profile.darkMode')}</Text>
               </View>
               <Switch
                 value={darkModeEnabled}
@@ -83,7 +96,7 @@ export default function ProfileScreen() {
             <TouchableOpacity className="bg-surface rounded-lg p-4 flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">
                 <IconSymbol name="lock.fill" size={20} color={colors.primary} />
-                <Text className="text-base text-foreground">Privacy & Security</Text>
+                <Text className="text-base text-foreground">{t('profile.privacySecurity')}</Text>
               </View>
               <IconSymbol name="chevron.right" size={20} color={colors.muted} />
             </TouchableOpacity>
@@ -98,7 +111,7 @@ export default function ProfileScreen() {
             >
               <View className="flex-row items-center gap-3">
                 <IconSymbol name="phone.fill" size={20} color={colors.primary} />
-                <Text className="text-base text-foreground">Call History</Text>
+                <Text className="text-base text-foreground">{t('profile.callHistoryLabel')}</Text>
               </View>
               <IconSymbol name="chevron.right" size={20} color={colors.muted} />
             </TouchableOpacity>
@@ -107,7 +120,7 @@ export default function ProfileScreen() {
             <TouchableOpacity className="bg-surface rounded-lg p-4 flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">
                 <IconSymbol name="questionmark.circle.fill" size={20} color={colors.primary} />
-                <Text className="text-base text-foreground">Help & Support</Text>
+                <Text className="text-base text-foreground">{t('profile.helpSupport')}</Text>
               </View>
               <IconSymbol name="chevron.right" size={20} color={colors.muted} />
             </TouchableOpacity>
@@ -116,7 +129,7 @@ export default function ProfileScreen() {
             <TouchableOpacity className="bg-surface rounded-lg p-4 flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">
                 <IconSymbol name="info.circle.fill" size={20} color={colors.primary} />
-                <Text className="text-base text-foreground">About</Text>
+                <Text className="text-base text-foreground">{t('profile.aboutLabel')}</Text>
               </View>
               <IconSymbol name="chevron.right" size={20} color={colors.muted} />
             </TouchableOpacity>
@@ -127,7 +140,7 @@ export default function ProfileScreen() {
             onPress={handleSignOut}
             className="bg-error rounded-lg py-3 items-center justify-center mt-4"
           >
-            <Text className="text-white font-semibold text-base">Sign Out</Text>
+            <Text className="text-white font-semibold text-base">{t('profile.signOut')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

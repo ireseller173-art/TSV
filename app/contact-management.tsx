@@ -70,7 +70,7 @@ export default function ContactManagementScreen() {
       setContacts(mockContacts);
     } catch (error) {
       console.error('Error loading contacts:', error);
-      Alert.alert(t('common.error'), 'Failed to load contacts');
+      Alert.alert(t('common.error'), t('contacts.loadError') || 'Failed to load contacts');
     } finally {
       setLoading(false);
     }
@@ -85,7 +85,7 @@ export default function ContactManagementScreen() {
       loadContacts();
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      Alert.alert(t('common.error'), 'Failed to update favorite');
+      Alert.alert(t('common.error'), t('contacts.updateFavoriteError') || 'Failed to update favorite');
     }
   };
 
@@ -98,7 +98,7 @@ export default function ContactManagementScreen() {
       loadContacts();
     } catch (error) {
       console.error('Error toggling block:', error);
-      Alert.alert(t('common.error'), 'Failed to update block status');
+      Alert.alert(t('common.error'), t('contacts.updateBlockError') || 'Failed to update block status');
     }
   };
 
@@ -106,18 +106,18 @@ export default function ContactManagementScreen() {
     Alert.alert(
       t('common.confirm'),
       activeTab === 'favorites'
-        ? 'Remove from favorites?'
-        : 'Unblock this contact?',
+        ? t('contacts.removeFavorite')
+        : t('contacts.unblockContact'),
       [
         { text: t('common.cancel'), onPress: () => {} },
         {
-          text: activeTab === 'favorites' ? 'Remove' : 'Unblock',
+          text: activeTab === 'favorites' ? t('contacts.removeAction') : t('contacts.unblockAction'),
           onPress: async () => {
             try {
               // TODO: Implement with Firebase
               loadContacts();
             } catch (error) {
-              Alert.alert(t('common.error'), 'Failed to remove contact');
+              Alert.alert(t('common.error'), t('contacts.removeError') || 'Failed to remove contact');
             }
           },
           style: 'destructive',
@@ -136,7 +136,7 @@ export default function ContactManagementScreen() {
         <View className="flex-1">
           <Text className="text-base font-medium text-foreground">{item.name}</Text>
           <Text className="text-xs text-muted">
-            {activeTab === 'favorites' ? 'Favorite' : 'Blocked'}
+            {activeTab === 'favorites' ? t('contacts.favoriteStatus') : t('contacts.blockedStatus')}
           </Text>
         </View>
       </View>
@@ -157,7 +157,7 @@ export default function ContactManagementScreen() {
           <IconSymbol name="arrow.left" size={24} color={colors.foreground} />
         </TouchableOpacity>
         <Text className="text-lg font-semibold text-foreground">
-          {activeTab === 'favorites' ? 'Favorites' : 'Blocked Contacts'}
+          {activeTab === 'favorites' ? t('contacts.favoritesTitle') : t('contacts.blockedTitle')}
         </Text>
         <View className="w-6" />
       </View>
@@ -179,7 +179,7 @@ export default function ContactManagementScreen() {
                 : 'text-muted'
             }`}
           >
-            Favorites
+            {t('contacts.favoritesTab')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -197,7 +197,7 @@ export default function ContactManagementScreen() {
                 : 'text-muted'
             }`}
           >
-            Blocked
+            {t('contacts.blockedTab')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -216,13 +216,13 @@ export default function ContactManagementScreen() {
           />
           <Text className="text-lg text-muted">
             {activeTab === 'favorites'
-              ? 'No favorite contacts'
-              : 'No blocked contacts'}
+              ? t('contacts.noFavorites')
+              : t('contacts.noBlocked')}
           </Text>
           <Text className="text-sm text-muted">
             {activeTab === 'favorites'
-              ? 'Add contacts to your favorites'
-              : 'Blocked contacts will appear here'}
+              ? t('contacts.addToFavorites')
+              : t('contacts.blockedHere')}
           </Text>
         </View>
       ) : (
