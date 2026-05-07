@@ -23,6 +23,7 @@ import { useAuth } from "@/lib/auth-provider";
 import { useChat } from "@/hooks/use-chat";
 import { useI18n } from "@/hooks/use-i18n";
 import { MessageOperationsService } from "@/lib/message-operations-service";
+import { UserPresenceService } from "@/lib/user-presence-service";
 import Haptics from "expo-haptics";
 import { Message } from "@/lib/chat-service";
 import { PersistentMessageStorage, StoredMessage } from "@/lib/persistent-message-storage";
@@ -56,12 +57,31 @@ export default function ChatDetailScreen() {
   // Import useState and useEffect if not already imported
   const [, setRefresh] = useState(0);
 
+  // Initialize presence tracking for current user
+  useEffect(() => {
+    const initPresence = async () => {
+      if (user?.id) {
+        await UserPresenceService.initialize(user.id);
+      }
+    };
+    initPresence();
+  }, [user?.id]);
+
   // Scroll to bottom when new messages arrive
   useEffect(() => {
     if (messages.length > 0) {
       flatListRef.current?.scrollToEnd({ animated: true });
     }
   }, [messages]);
+
+  // Update presence on unmount
+  useEffect(() => {
+    return () => {
+      if (user?.id) {
+        UserPresenceService.setUserOffline(user.id);
+      }
+    };
+  }, [user?.id]);
 
   const handleSendMessage = async () => {
     if (!messageText.trim() || !user) return;
@@ -111,10 +131,29 @@ export default function ChatDetailScreen() {
     }
   };
 
-  const handleEditMessage = () => {
-    if (selectedMessage) {
-      setMessageText(selectedMessage.text);
-      handleDeleteMessage();
+  const handleEditMessage = async () => {
+    if (selectedMessage && user) {
+      try {
+        // Edit the message using MessageOperationsService
+        const editedMessage = await MessageOperationsService.editMessage(
+          selectedMessage.id,
+          messageText || selectedMessage.text,
+          currentChatId
+        );
+        
+        if (editedMessage) {
+          // Clear input and close menu
+          setMessageText('');
+          setShowMessageMenu(false);
+          setRefresh(prev => prev + 1);
+          
+          if (Platform.OS !== 'web') {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }
+        }
+      } catch (error) {
+        console.error('Error editing message:', error);
+      }
     }
   };
 
@@ -147,7 +186,7 @@ export default function ChatDetailScreen() {
             </TouchableOpacity>
             <View className="flex-1">
               <Text className="text-lg font-semibold text-foreground">{chatName}</Text>
-              <Text className="text-xs text-muted">{t('common.online')}</Text>
+              <Text className="text-xs text-success">🟢 {t('common.online')}</Text>
             </View>
           </View>
           <View className="flex-row gap-3">

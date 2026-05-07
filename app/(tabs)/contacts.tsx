@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
+import { UserPresenceService } from "@/lib/user-presence-service";
 
 interface Contact {
   id: string;
@@ -28,6 +29,15 @@ export default function ContactsScreen() {
   const [filteredContacts, setFilteredContacts] = useState<Contact[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+
+  // Initialize presence tracking
+  useEffect(() => {
+    const initPresence = async () => {
+      // In a real app, this would be the current user's ID
+      await UserPresenceService.initialize('current-user-id');
+    };
+    initPresence();
+  }, []);
 
   useEffect(() => {
     const mockContacts: Contact[] = [
