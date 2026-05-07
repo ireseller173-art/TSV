@@ -7,6 +7,55 @@ const db = admin.firestore();
 const messaging = admin.messaging();
 
 /**
+ * Translations for error messages
+ */
+const errorMessages = {
+  en: {
+    chatNotFound: "Chat not found",
+    noDeviceTokens: "No device tokens for user",
+    errorSendingNotification: "Error sending notification",
+    groupNotFound: "Group not found",
+    errorSendingGroupNotification: "Error sending group notification",
+    userNotAuthenticated: "User not authenticated",
+    errorUpdatingPresence: "Failed to update presence",
+    failedUpdatePresence: "Failed to update presence",
+    deviceTokenRequired: "Device token is required",
+    errorRegisteringToken: "Error registering device token",
+    failedRegisterToken: "Failed to register device token",
+    errorUnregisteringToken: "Error unregistering device token",
+    failedUnregisterToken: "Failed to unregister device token",
+    errorDuringCleanup: "Error during cleanup",
+    newMessage: "New message",
+    userInGroup: "in",
+  },
+  ru: {
+    chatNotFound: "Чат не найден",
+    noDeviceTokens: "Нет токенов устройства для пользователя",
+    errorSendingNotification: "Ошибка при отправке уведомления",
+    groupNotFound: "Группа не найдена",
+    errorSendingGroupNotification: "Ошибка при отправке группового уведомления",
+    userNotAuthenticated: "Пользователь не аутентифицирован",
+    errorUpdatingPresence: "Не удалось обновить статус",
+    failedUpdatePresence: "Не удалось обновить статус",
+    deviceTokenRequired: "Требуется токен устройства",
+    errorRegisteringToken: "Ошибка при регистрации токена",
+    failedRegisterToken: "Не удалось зарегистрировать токен",
+    errorUnregisteringToken: "Ошибка при отмене регистрации токена",
+    failedUnregisterToken: "Не удалось отменить регистрацию токена",
+    errorDuringCleanup: "Ошибка во время очистки",
+    newMessage: "Новое сообщение",
+    userInGroup: "в",
+  },
+};
+
+/**
+ * Get error message in specified language
+ */
+function getErrorMessage(key: keyof typeof errorMessages.en, language: "en" | "ru" = "en"): string {
+  return errorMessages[language]?.[key] || errorMessages.en[key];
+}
+
+/**
  * Отправить push-уведомление при новом сообщении
  */
 export const sendMessageNotification = functions.firestore
@@ -21,7 +70,7 @@ export const sendMessageNotification = functions.firestore
       const chatData = chatDoc.data();
 
       if (!chatData) {
-        console.log("Chat not found:", chatId);
+        console.log(getErrorMessage("chatNotFound", "ru"), chatId);
         return;
       }
 
@@ -39,14 +88,14 @@ export const sendMessageNotification = functions.firestore
       const recipientData = recipientDoc.data();
 
       if (!recipientData || !recipientData.deviceTokens || recipientData.deviceTokens.length === 0) {
-        console.log("No device tokens for user:", participantId);
+        console.log(getErrorMessage("noDeviceTokens", "ru"), participantId);
         return;
       }
 
       // Отправить push-уведомление
       const payload = {
         notification: {
-          title: senderData?.name || "Новое сообщение",
+          title: senderData?.name || getErrorMessage("newMessage", "ru"),
           body: message.text.substring(0, 100),
           sound: "default",
         },
@@ -65,7 +114,7 @@ export const sendMessageNotification = functions.firestore
       console.log(`Sent ${response.successCount} notifications`);
       if (response.failureCount > 0) {
         console.log(`Failed to send ${response.failureCount} notifications`);
-        
+
         // Удалить невалидные токены
         const invalidTokens = response.responses
           .map((resp: any, idx: number) => (resp.success ? null : recipientData.deviceTokens[idx]))
@@ -78,7 +127,7 @@ export const sendMessageNotification = functions.firestore
         }
       }
     } catch (error) {
-      console.error("Error sending notification:", error);
+      console.error(getErrorMessage("errorSendingNotification", "ru"), error);
     }
   });
 
@@ -97,7 +146,7 @@ export const sendGroupMessageNotification = functions.firestore
       const groupData = groupDoc.data();
 
       if (!groupData) {
-        console.log("Group not found:", groupId);
+        console.log(getErrorMessage("groupNotFound", "ru"), groupId);
         return;
       }
 
@@ -119,7 +168,7 @@ export const sendGroupMessageNotification = functions.firestore
 
         const payload = {
           notification: {
-            title: `${senderData?.name || "Пользователь"} в ${groupData.name}`,
+            title: `${senderData?.name || "User"} ${getErrorMessage("userInGroup", "ru")} ${groupData.name}`,
             body: message.text.substring(0, 100),
             sound: "default",
           },
@@ -139,7 +188,7 @@ export const sendGroupMessageNotification = functions.firestore
 
       console.log(`Sent group notifications to ${recipients.length} members`);
     } catch (error) {
-      console.error("Error sending group notification:", error);
+      console.error(getErrorMessage("errorSendingGroupNotification", "ru"), error);
     }
   });
 
@@ -148,7 +197,10 @@ export const sendGroupMessageNotification = functions.firestore
  */
 export const updateUserPresence = functions.https.onCall(async (data: any, context: any) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError("unauthenticated", "User not authenticated");
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      getErrorMessage("userNotAuthenticated", "ru")
+    );
   }
 
   const userId = context.auth.uid;
@@ -166,8 +218,11 @@ export const updateUserPresence = functions.https.onCall(async (data: any, conte
 
     return { success: true };
   } catch (error) {
-    console.error("Error updating presence:", error);
-    throw new functions.https.HttpsError("internal", "Failed to update presence");
+    console.error(getErrorMessage("errorUpdatingPresence", "ru"), error);
+    throw new functions.https.HttpsError(
+      "internal",
+      getErrorMessage("failedUpdatePresence", "ru")
+    );
   }
 });
 
@@ -176,14 +231,20 @@ export const updateUserPresence = functions.https.onCall(async (data: any, conte
  */
 export const registerDeviceToken = functions.https.onCall(async (data: any, context: any) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError("unauthenticated", "User not authenticated");
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      getErrorMessage("userNotAuthenticated", "ru")
+    );
   }
 
   const userId = context.auth.uid;
   const { token } = data;
 
   if (!token) {
-    throw new functions.https.HttpsError("invalid-argument", "Device token is required");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      getErrorMessage("deviceTokenRequired", "ru")
+    );
   }
 
   try {
@@ -194,8 +255,11 @@ export const registerDeviceToken = functions.https.onCall(async (data: any, cont
 
     return { success: true, message: "Device token registered" };
   } catch (error) {
-    console.error("Error registering device token:", error);
-    throw new functions.https.HttpsError("internal", "Failed to register device token");
+    console.error(getErrorMessage("errorRegisteringToken", "ru"), error);
+    throw new functions.https.HttpsError(
+      "internal",
+      getErrorMessage("failedRegisterToken", "ru")
+    );
   }
 });
 
@@ -204,14 +268,20 @@ export const registerDeviceToken = functions.https.onCall(async (data: any, cont
  */
 export const unregisterDeviceToken = functions.https.onCall(async (data: any, context: any) => {
   if (!context.auth) {
-    throw new functions.https.HttpsError("unauthenticated", "User not authenticated");
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      getErrorMessage("userNotAuthenticated", "ru")
+    );
   }
 
   const userId = context.auth.uid;
   const { token } = data;
 
   if (!token) {
-    throw new functions.https.HttpsError("invalid-argument", "Device token is required");
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      getErrorMessage("deviceTokenRequired", "ru")
+    );
   }
 
   try {
@@ -221,8 +291,11 @@ export const unregisterDeviceToken = functions.https.onCall(async (data: any, co
 
     return { success: true, message: "Device token unregistered" };
   } catch (error) {
-    console.error("Error unregistering device token:", error);
-    throw new functions.https.HttpsError("internal", "Failed to unregister device token");
+    console.error(getErrorMessage("errorUnregisteringToken", "ru"), error);
+    throw new functions.https.HttpsError(
+      "internal",
+      getErrorMessage("failedUnregisterToken", "ru")
+    );
   }
 });
 
@@ -266,7 +339,7 @@ export const cleanupOldMessages = functions.pubsub.schedule("every day 02:00").o
     console.log("Cleanup completed");
     return { success: true };
   } catch (error) {
-    console.error("Error during cleanup:", error);
+    console.error(getErrorMessage("errorDuringCleanup", "ru"), error);
     throw error;
   }
 });

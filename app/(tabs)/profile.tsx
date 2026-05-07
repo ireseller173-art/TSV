@@ -13,6 +13,7 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
 import { useAuth } from "@/lib/auth-provider";
 import { useI18n } from "@/hooks/use-i18n";
+import { LanguagePicker } from "@/components/language-picker";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -115,6 +116,11 @@ export default function ProfileScreen() {
               </View>
               <IconSymbol name="chevron.right" size={20} color={colors.muted} />
             </TouchableOpacity>
+
+            {/* Language Picker */}
+            <View className="bg-surface rounded-lg p-4">
+              <LanguagePicker />
+            </View>
 
             {/* Help */}
             <TouchableOpacity className="bg-surface rounded-lg p-4 flex-row items-center justify-between">
