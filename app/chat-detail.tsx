@@ -17,10 +17,12 @@ import { ReactionPicker } from "@/components/reaction-picker";
 import { CallButton } from "@/components/call-button";
 import { MediaPicker } from "@/components/media-picker";
 import { MediaPreview } from "@/components/media-preview";
+import { MessageContextMenu } from "@/components/message-context-menu";
 import { useColors } from "@/hooks/use-colors";
 import { useAuth } from "@/lib/auth-provider";
 import { useChat } from "@/hooks/use-chat";
 import { useI18n } from "@/hooks/use-i18n";
+import { MessageOperationsService } from "@/lib/message-operations-service";
 import Haptics from "expo-haptics";
 import { Message } from "@/lib/chat-service";
 
@@ -42,7 +44,12 @@ export default function ChatDetailScreen() {
   const [showMediaPreview, setShowMediaPreview] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<any>(null);
   const [mediaCaption, setMediaCaption] = useState("");
+  const [showMessageMenu, setShowMessageMenu] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const flatListRef = useRef<FlatList>(null);
+
+  // Import useState and useEffect if not already imported
+  const [, setRefresh] = useState(0);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -77,11 +84,25 @@ export default function ChatDetailScreen() {
     }
   };
 
+  const handleDeleteMessage = async () => {
+    if (selectedMessage) {
+      await MessageOperationsService.deleteMessage(selectedMessage.id, chatId);
+      setShowMessageMenu(false);
+    }
+  };
+
+  const handleEditMessage = () => {
+    if (selectedMessage) {
+      setMessageText(selectedMessage.text);
+      handleDeleteMessage();
+    }
+  };
+
   const renderMessageItem = ({ item }: { item: Message }) => (
     <TouchableOpacity
       onLongPress={() => {
-        setSelectedMessageId(item.id);
-        setShowReactionPicker(true);
+        setSelectedMessage(item);
+        setShowMessageMenu(true);
       }}
     >
       <MessageBubble
@@ -167,6 +188,24 @@ export default function ChatDetailScreen() {
           </TouchableOpacity>
         </View>
       </ScreenContainer>
+
+      {/* Message Context Menu */}
+      {selectedMessage && (
+        <MessageContextMenu
+          visible={showMessageMenu}
+          onClose={() => setShowMessageMenu(false)}
+          onDelete={handleDeleteMessage}
+          onEdit={handleEditMessage}
+          onReply={() => setShowMessageMenu(false)}
+          onForward={() => setShowMessageMenu(false)}
+          onReact={() => {
+            setSelectedMessageId(selectedMessage.id);
+            setShowReactionPicker(true);
+            setShowMessageMenu(false);
+          }}
+          isSentByCurrentUser={selectedMessage.senderId === user?.id}
+        />
+      )}
 
       {/* Reaction Picker */}
       <ReactionPicker
