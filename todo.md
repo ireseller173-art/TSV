@@ -175,3 +175,44 @@
 - [x] Include program installation instructions
 - [x] Add troubleshooting section
 - [ ] Create video tutorial references
+
+## Phase 15: Firebase Integration & Real Authentication
+- [x] Create Firebase configuration file (.env.local)
+- [x] Install Firebase SDK
+- [x] Implement Firebase Authentication (Email/Password)
+- [x] Create Firestore database schema
+- [x] Implement user profile storage in Firestore
+- [x] Implement real sign-in with Firebase
+- [x] Implement real sign-up with Firebase
+- [x] Implement password reset
+- [x] Implement user presence tracking
+- [x] Fix TypeScript error in storageProxy.ts
+
+
+## Phase 16: Push Notifications & Badge Counters
+- [x] Implement push notifications on locked screen
+- [x] Add app badge counter for unread messages
+- [x] Add app badge counter for missed calls
+- [x] Implement local notification handling
+- [x] Add notification sound and vibration
+
+## Phase 17: Unread Counters in UI
+- [x] Add unread message counter in contacts list
+- [x] Add missed call counter in contacts list
+- [x] Implement counter update on message received
+- [x] Implement counter update on call received
+- [x] Add badge styling with red background
+
+## Phase 18: Message Styling & Missed Calls
+- [x] Style sent messages (right side, different color)
+- [x] Style received messages (left side, different color)
+- [x] Add missed call history in chat
+- [x] Display missed call time
+- [ ] Add missed call notification
+
+## Phase 19: Firebase Deployment & Setup
+- [x] Create Firebase setup guide for user
+- [x] Document how to get Firebase credentials
+- [x] Create .env.local setup instructions
+- [x] Document how to deploy to Firebase
+- [x] Create troubleshooting guide
