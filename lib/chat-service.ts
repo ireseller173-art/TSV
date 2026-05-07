@@ -11,6 +11,9 @@ export interface Message {
   status: "sending" | "sent" | "delivered" | "read";
   type: "text" | "image" | "voice" | "call";
   reactions: { [emoji: string]: string[] };
+  isEdited?: boolean;
+  editedAt?: number;
+  isDeleted?: boolean;
 }
 
 export interface Chat {
