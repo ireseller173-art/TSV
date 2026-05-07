@@ -25,6 +25,7 @@ import { useI18n } from "@/hooks/use-i18n";
 import { MessageOperationsService } from "@/lib/message-operations-service";
 import Haptics from "expo-haptics";
 import { Message } from "@/lib/chat-service";
+import { PersistentMessageStorage, StoredMessage } from "@/lib/persistent-message-storage";
 
 export default function ChatDetailScreen() {
   const router = useRouter();
@@ -62,13 +63,28 @@ export default function ChatDetailScreen() {
     if (!messageText.trim() || !user) return;
 
     try {
+      const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const storedMessage: StoredMessage = {
+        id: messageId,
+        chatId,
+        senderId: user.id,
+        senderName: user.name,
+        text: messageText.trim(),
+        timestamp: Date.now(),
+        status: 'sent',
+      };
+      
+      await PersistentMessageStorage.saveMessage(storedMessage);
       await sendMessage(
         messageText,
         user.id,
         user.name,
         user.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=default"
       );
+      
       setMessageText("");
+      setRefresh(prev => prev + 1);
+      
       if (Platform.OS !== "web") {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
