@@ -261,9 +261,6 @@ export async function removeGroupMember(
 /**
  * Promote/demote member role
  */
-/**
- * Promote/demote member role (including moderator role)
- */
 export async function promoteGroupMember(
   currentUserId: string,
   input: GroupMemberPromoteInput
@@ -284,13 +281,7 @@ export async function promoteGroupMember(
     throw new Error('Member not found');
   }
 
-  // Validate role (admin, moderator, member)
-  const validRoles = ['admin', 'moderator', 'member'];
-  if (!validRoles.includes(input.role)) {
-    throw new Error('Invalid role');
-  }
-
-  targetMember.role = input.role as GroupMemberRole;
+  targetMember.role = input.role;
   group.updatedAt = Date.now();
 
   const groups = await getAllGroupChats();
@@ -368,159 +359,6 @@ export async function getGroupMessages(groupId: string): Promise<GroupChatMessag
     console.error('Error loading group messages:', error);
     return [];
   }
-}
-
-/**
- * Archive a group chat
- */
-export async function archiveGroupChat(
-  currentUserId: string,
-  groupId: string
-): Promise<GroupChat> {
-  const group = await getGroupChat(groupId);
-  if (!group) {
-    throw new Error('Group not found');
-  }
-
-  // Check if user is admin
-  const userMember = group.members.find((m) => m.userId === currentUserId);
-  if (!userMember || userMember.role !== 'admin') {
-    throw new Error('Only admins can archive groups');
-  }
-
-  const updated: GroupChat = {
-    ...group,
-    isArchived: true,
-    updatedAt: Date.now(),
-  };
-
-  const groups = await getAllGroupChats();
-  const index = groups.findIndex((g) => g.id === groupId);
-  if (index !== -1) {
-    groups[index] = updated;
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
-  }
-
-  return updated;
-}
-
-/**
- * Unarchive a group chat
- */
-export async function unarchiveGroupChat(
-  currentUserId: string,
-  groupId: string
-): Promise<GroupChat> {
-  const group = await getGroupChat(groupId);
-  if (!group) {
-    throw new Error('Group not found');
-  }
-
-  // Check if user is admin
-  const userMember = group.members.find((m) => m.userId === currentUserId);
-  if (!userMember || userMember.role !== 'admin') {
-    throw new Error('Only admins can unarchive groups');
-  }
-
-  const updated: GroupChat = {
-    ...group,
-    isArchived: false,
-    updatedAt: Date.now(),
-  };
-
-  const groups = await getAllGroupChats();
-  const index = groups.findIndex((g) => g.id === groupId);
-  if (index !== -1) {
-    groups[index] = updated;
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
-  }
-
-  return updated;
-}
-
-/**
- * Export group chat history as JSON
- */
-export async function exportGroupHistory(
-  currentUserId: string,
-  groupId: string
-): Promise<string> {
-  const group = await getGroupChat(groupId);
-  if (!group) {
-    throw new Error('Group not found');
-  }
-
-  // Check if user is member
-  const userMember = group.members.find((m) => m.userId === currentUserId);
-  if (!userMember) {
-    throw new Error('You are not a member of this group');
-  }
-
-  const messages = await getGroupMessages(groupId);
-  const exportData = {
-    group: {
-      id: group.id,
-      name: group.name,
-      description: group.description,
-      createdAt: group.createdAt,
-      memberCount: group.memberCount,
-    },
-    messages: messages.map((m) => ({
-      id: m.id,
-      senderName: m.senderName,
-      content: m.content,
-      type: m.type,
-      createdAt: m.createdAt,
-      reactions: m.reactions,
-    })),
-    exportedAt: Date.now(),
-  };
-
-  return JSON.stringify(exportData, null, 2);
-}
-
-/**
- * Restrict member permissions
- */
-export async function restrictMemberPermissions(
-  currentUserId: string,
-  groupId: string,
-  userId: string,
-  restrictions: {
-    canSendMessages?: boolean;
-    canSendMedia?: boolean;
-    canSendVoiceMessages?: boolean;
-    canReact?: boolean;
-  }
-): Promise<GroupMember> {
-  const group = await getGroupChat(groupId);
-  if (!group) {
-    throw new Error('Group not found');
-  }
-
-  // Check if current user is admin
-  const userMember = group.members.find((m) => m.userId === currentUserId);
-  if (!userMember || userMember.role !== 'admin') {
-    throw new Error('Only admins can restrict member permissions');
-  }
-
-  const targetMember = group.members.find((m) => m.userId === userId);
-  if (!targetMember) {
-    throw new Error('Member not found');
-  }
-
-  // Add restrictions to member
-  targetMember.restrictions = restrictions;
-  group.updatedAt = Date.now();
-
-  const groups = await getAllGroupChats();
-  const index = groups.findIndex((g) => g.id === groupId);
-  if (index !== -1) {
-    groups[index] = group;
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
-  }
-
-  return targetMember;
 }
 
 /**

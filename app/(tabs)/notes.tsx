@@ -17,8 +17,6 @@ import { NotesService, type Note } from '@/lib/notes-service';
 import { useI18n } from '@/lib/i18n-provider';
 import { cn } from '@/lib/utils';
 import { useFocusEffect } from '@react-navigation/native';
-import { PressableButton } from '@/components/pressable-button';
-import { PressableCard } from '@/components/pressable-card';
 
 export default function NotesScreen() {
   const colors = useColors();
@@ -113,36 +111,33 @@ export default function NotesScreen() {
   );
 
   const renderNoteItem = ({ item }: { item: Note }) => {
+    const { scaleValue, onPressIn, onPressOut } = useTactileFeedback();
+
     return (
-      <PressableCard
-        onPress={() => handleEditNote(item)}
-        showGlow={true}
-        style={{ marginBottom: 12 }}
-      >
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 16, fontWeight: '600', color: colors.foreground }}>
-              {item.title}
-            </Text>
-            <Text style={{ fontSize: 12, color: colors.muted, marginTop: 4 }}>
-              {item.date} {item.time}
-            </Text>
+      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+        <Pressable
+          onPressIn={onPressIn}
+          onPressOut={onPressOut}
+          onPress={() => handleEditNote(item)}
+          className="bg-surface rounded-lg p-4 mb-3 border border-border"
+        >
+          <View className="flex-row justify-between items-start mb-2">
+            <View className="flex-1">
+              <Text className="text-lg font-semibold text-foreground">{item.title}</Text>
+              <Text className="text-sm text-muted mt-1">
+                {item.date} {item.time}
+              </Text>
+            </View>
+            <Pressable
+              onPress={() => handleDeleteNote(item.id)}
+              className="ml-2 p-2"
+            >
+              <Text className="text-error text-lg">✕</Text>
+            </Pressable>
           </View>
-          <Pressable
-            onPress={() => handleDeleteNote(item.id)}
-            style={({ pressed }) => [{
-              marginLeft: 8,
-              padding: 8,
-              opacity: pressed ? 0.6 : 1,
-            }]}
-          >
-            <Text style={{ color: colors.error, fontSize: 18 }}>✕</Text>
-          </Pressable>
-        </View>
-        <Text style={{ fontSize: 12, color: colors.foreground, lineHeight: 18 }} numberOfLines={2}>
-          {item.content}
-        </Text>
-      </PressableCard>
+          <Text className="text-sm text-foreground line-clamp-2">{item.content}</Text>
+        </Pressable>
+      </Animated.View>
     );
   };
 
@@ -160,20 +155,23 @@ export default function NotesScreen() {
             placeholderTextColor={colors.muted}
           />
         </Animated.View>
-        <PressableButton
-          label="+"
-          variant="primary"
-          size="medium"
-          onPress={() => {
-            setEditingNote(null);
-            setTitle('');
-            setContent('');
-            setDate(new Date().toISOString().split('T')[0]);
-            setTime(new Date().toTimeString().slice(0, 5));
-            setShowModal(true);
-          }}
-          showGlow={true}
-        />
+        <Animated.View style={{ transform: [{ scale: addScale }] }}>
+          <TactileButton
+            label="+"
+            variant="primary"
+            size="medium"
+            onPress={() => {
+              setEditingNote(null);
+              setTitle('');
+              setContent('');
+              setDate(new Date().toISOString().split('T')[0]);
+              setTime(new Date().toTimeString().slice(0, 5));
+              setShowModal(true);
+            }}
+            onPressIn={addPressIn}
+            onPressOut={addPressOut}
+          />
+        </Animated.View>
       </View>
 
       {filteredNotes.length === 0 ? (
@@ -234,24 +232,20 @@ export default function NotesScreen() {
           </View>
 
           <View className="flex-row gap-3">
-            <View style={{ flex: 1 }}>
-              <PressableButton
-                label={t('common.cancel')}
-                variant="secondary"
-                size="medium"
-                onPress={() => setShowModal(false)}
-                showGlow={true}
-              />
-            </View>
-            <View style={{ flex: 1 }}>
-              <PressableButton
-                label={t('common.save')}
-                variant="primary"
-                size="medium"
-                onPress={handleSaveNote}
-                showGlow={true}
-              />
-            </View>
+            <TactileButton
+              label={t('common.cancel')}
+              variant="secondary"
+              size="medium"
+              className="flex-1"
+              onPress={() => setShowModal(false)}
+            />
+            <TactileButton
+              label={t('common.save')}
+              variant="primary"
+              size="medium"
+              className="flex-1"
+              onPress={handleSaveNote}
+            />
           </View>
         </ScreenContainer>
       </Modal>

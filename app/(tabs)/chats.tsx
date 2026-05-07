@@ -3,20 +3,16 @@ import {
   View,
   Text,
   FlatList,
+  TouchableOpacity,
   TextInput,
   Image,
   ActivityIndicator,
-  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
 import { useAuth } from "@/lib/auth-provider";
-import { useI18n } from "@/hooks/use-i18n";
-import { ChatContextMenu } from "@/components/chat-context-menu";
-import { PressableButton } from "@/components/pressable-button";
-import { PressableListItem } from "@/components/pressable-list-item";
 
 interface Chat {
   id: string;
@@ -32,15 +28,10 @@ export default function ChatsScreen() {
   const router = useRouter();
   const colors = useColors();
   const { user } = useAuth();
-  const { t, language, toggleLanguage } = useI18n();
   const [chats, setChats] = useState<Chat[]>([]);
   const [filteredChats, setFilteredChats] = useState<Chat[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
-  const [showContextMenu, setShowContextMenu] = useState(false);
-  const [pinnedChats, setPinnedChats] = useState<Set<string>>(new Set());
-  const [mutedChats, setMutedChats] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const mockChats: Chat[] = [
@@ -88,107 +79,56 @@ export default function ChatsScreen() {
     }
   }, [searchQuery, chats]);
 
-  const handlePinChat = () => {
-    if (!selectedChatId) return;
-    const newPinned = new Set(pinnedChats);
-    if (newPinned.has(selectedChatId)) {
-      newPinned.delete(selectedChatId);
-    } else {
-      newPinned.add(selectedChatId);
-    }
-    setPinnedChats(newPinned);
-  };
-
-  const handleMuteChat = () => {
-    if (!selectedChatId) return;
-    const newMuted = new Set(mutedChats);
-    if (newMuted.has(selectedChatId)) {
-      newMuted.delete(selectedChatId);
-    } else {
-      newMuted.add(selectedChatId);
-    }
-    setMutedChats(newMuted);
-  };
-
-  const handleDeleteChat = () => {
-    if (!selectedChatId) return;
-    setChats(chats.filter((c) => c.id !== selectedChatId));
-  };
-
-  const handleArchiveChat = () => {
-    if (!selectedChatId) return;
-    console.log('Archive chat:', selectedChatId);
-  };
-
   const renderChatItem = ({ item }: { item: Chat }) => (
-    <PressableListItem
+    <TouchableOpacity
       onPress={() => {
-        router.push({
-          pathname: "/chat-detail",
-          params: {
-            chatId: item.id,
-            chatName: item.name,
-            chatAvatar: item.avatar,
-            isGroup: item.isGroup ? "true" : "false",
-          },
-        });
+        // Navigate to chat detail - will be implemented later
       }}
-      leftIcon={<Image source={{ uri: item.avatar }} style={{ width: 40, height: 40, borderRadius: 20 }} />}
-      rightIcon={item.unread > 0 ? (
-        <View style={{ backgroundColor: colors.primary, borderRadius: 12, width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>{item.unread}</Text>
-        </View>
-      ) : null}
-      showGlow={true}
+      className="flex-row items-center gap-3 px-4 py-3 border-b border-border"
     >
-      <View style={{ flex: 1, gap: 4 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={{ fontSize: 14, fontWeight: '600', color: colors.foreground, flex: 1 }}>
+      <Image source={{ uri: item.avatar }} className="w-12 h-12 rounded-full" />
+
+      <View className="flex-1 gap-1">
+        <View className="flex-row items-center justify-between">
+          <Text className="text-base font-semibold text-foreground flex-1">
             {item.name}
           </Text>
-          <Text style={{ fontSize: 12, color: colors.muted }}>{item.timestamp}</Text>
+          <Text className="text-xs text-muted">{item.timestamp}</Text>
         </View>
-        <Text style={{ fontSize: 12, color: colors.muted }} numberOfLines={1}>
+        <Text className="text-sm text-muted" numberOfLines={1}>
           {item.lastMessage}
         </Text>
       </View>
-    </PressableListItem>
+
+      {item.unread > 0 && (
+        <View className="bg-accent rounded-full w-6 h-6 items-center justify-center">
+          <Text className="text-white text-xs font-bold">{item.unread}</Text>
+        </View>
+      )}
+    </TouchableOpacity>
   );
 
   return (
     <ScreenContainer className="flex-1 gap-4" edges={["top", "left", "right"]}>
       <View className="px-4 pt-4 gap-4">
         <View className="flex-row items-center justify-between">
-          <Text className="text-2xl font-bold text-foreground">{t('chat.messages')}</Text>
-          <Pressable
+          <Text className="text-2xl font-bold text-foreground">Messages</Text>
+          <TouchableOpacity
             onPress={() => {
               // @ts-ignore
               router.push("/new-chat");
             }}
-            style={({ pressed }) => [{
-              backgroundColor: colors.primary,
-              borderRadius: 20,
-              width: 40,
-              height: 40,
-              alignItems: 'center',
-              justifyContent: 'center',
-              opacity: pressed ? 0.8 : 1,
-              shadowColor: colors.primary,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: pressed ? 0.4 : 0.1,
-              shadowRadius: 4,
-              elevation: pressed ? 8 : 2,
-            }]}
+            className="bg-primary rounded-full w-10 h-10 items-center justify-center"
           >
             <IconSymbol name="plus" size={20} color="white" />
-          </Pressable>
+          </TouchableOpacity>
         </View>
 
         <View className="flex-row items-center gap-2 bg-surface border border-border rounded-lg px-3 py-2">
           <IconSymbol name="magnifyingglass" size={18} color={colors.muted} />
           <TextInput
             className="flex-1 text-foreground"
-            placeholder={t('chat.searchConversations')}
+            placeholder="Search conversations"
             placeholderTextColor={colors.muted}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -202,17 +142,16 @@ export default function ChatsScreen() {
         </View>
       ) : filteredChats.length === 0 ? (
         <View className="flex-1 items-center justify-center gap-2">
-          <Text className="text-lg text-muted">{t('chat.noChats')}</Text>
-          <PressableButton
+          <Text className="text-lg text-muted">No conversations yet</Text>
+          <TouchableOpacity
             onPress={() => {
               // @ts-ignore
               router.push("/contacts");
             }}
-            label={t('chat.startChatting')}
-            variant="primary"
-            size="medium"
-            showGlow={true}
-          />
+            className="mt-4 bg-primary px-6 py-2 rounded-lg"
+          >
+            <Text className="text-white font-semibold">Start Chatting</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -220,20 +159,6 @@ export default function ChatsScreen() {
           renderItem={renderChatItem}
           keyExtractor={(item) => item.id}
           scrollEnabled={true}
-        />
-      )}
-
-      {/* Chat Context Menu */}
-      {selectedChatId && (
-        <ChatContextMenu
-          visible={showContextMenu}
-          onClose={() => setShowContextMenu(false)}
-          onPin={handlePinChat}
-          onMute={handleMuteChat}
-          onDelete={handleDeleteChat}
-          onArchive={handleArchiveChat}
-          isPinned={pinnedChats.has(selectedChatId)}
-          isMuted={mutedChats.has(selectedChatId)}
         />
       )}
     </ScreenContainer>

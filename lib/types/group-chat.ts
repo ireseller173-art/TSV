@@ -13,12 +13,6 @@ export interface GroupMember {
   role: GroupMemberRole;
   joinedAt: number;
   isActive: boolean;
-  restrictions?: {
-    canSendMessages?: boolean;
-    canSendMedia?: boolean;
-    canSendVoiceMessages?: boolean;
-    canReact?: boolean;
-  };
 }
 
 export interface GroupChat {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -17,32 +17,22 @@ import { ReactionPicker } from "@/components/reaction-picker";
 import { CallButton } from "@/components/call-button";
 import { MediaPicker } from "@/components/media-picker";
 import { MediaPreview } from "@/components/media-preview";
-import { MessageContextMenu } from "@/components/message-context-menu";
 import { useColors } from "@/hooks/use-colors";
 import { useAuth } from "@/lib/auth-provider";
 import { useChat } from "@/hooks/use-chat";
-import { useI18n } from "@/hooks/use-i18n";
-import { MessageOperationsService } from "@/lib/message-operations-service";
-import { UserPresenceService } from "@/lib/user-presence-service";
 import Haptics from "expo-haptics";
 import { Message } from "@/lib/chat-service";
-import { PersistentMessageStorage, StoredMessage } from "@/lib/persistent-message-storage";
 
 export default function ChatDetailScreen() {
   const router = useRouter();
   const colors = useColors();
   const { user } = useAuth();
-  const { t } = useI18n();
-  const { chatId = "1", chatName = "Chat", groupId } = useLocalSearchParams<{
-    chatId?: string;
-    chatName?: string;
-    groupId?: string;
+  const { chatId = "1", chatName = "Chat" } = useLocalSearchParams<{
+    chatId: string;
+    chatName: string;
   }>();
-  
-  // Use groupId if provided, otherwise use chatId
-  const currentChatId = groupId || chatId;
 
-  const { messages, sendMessage, addReaction } = useChat(currentChatId);
+  const { messages, sendMessage, addReaction } = useChat(chatId);
   const [messageText, setMessageText] = useState("");
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
@@ -50,22 +40,7 @@ export default function ChatDetailScreen() {
   const [showMediaPreview, setShowMediaPreview] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<any>(null);
   const [mediaCaption, setMediaCaption] = useState("");
-  const [showMessageMenu, setShowMessageMenu] = useState(false);
-  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const flatListRef = useRef<FlatList>(null);
-
-  // Import useState and useEffect if not already imported
-  const [, setRefresh] = useState(0);
-
-  // Initialize presence tracking for current user
-  useEffect(() => {
-    const initPresence = async () => {
-      if (user?.id) {
-        await UserPresenceService.initialize(user.id);
-      }
-    };
-    initPresence();
-  }, [user?.id]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -74,41 +49,17 @@ export default function ChatDetailScreen() {
     }
   }, [messages]);
 
-  // Update presence on unmount
-  useEffect(() => {
-    return () => {
-      if (user?.id) {
-        UserPresenceService.setUserOffline(user.id);
-      }
-    };
-  }, [user?.id]);
-
   const handleSendMessage = async () => {
     if (!messageText.trim() || !user) return;
 
     try {
-      const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const storedMessage: StoredMessage = {
-        id: messageId,
-        chatId: currentChatId,
-        senderId: user.id,
-        senderName: user.name,
-        text: messageText.trim(),
-        timestamp: Date.now(),
-        status: 'sent',
-      };
-      
-      await PersistentMessageStorage.saveMessage(storedMessage);
       await sendMessage(
         messageText,
         user.id,
         user.name,
         user.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=default"
       );
-      
       setMessageText("");
-      setRefresh(prev => prev + 1);
-      
       if (Platform.OS !== "web") {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
@@ -124,44 +75,11 @@ export default function ChatDetailScreen() {
     }
   };
 
-  const handleDeleteMessage = async () => {
-    if (selectedMessage) {
-      await MessageOperationsService.deleteMessage(selectedMessage.id, chatId);
-      setShowMessageMenu(false);
-    }
-  };
-
-  const handleEditMessage = async () => {
-    if (selectedMessage && user) {
-      try {
-        // Edit the message using MessageOperationsService
-        const editedMessage = await MessageOperationsService.editMessage(
-          selectedMessage.id,
-          messageText || selectedMessage.text,
-          currentChatId
-        );
-        
-        if (editedMessage) {
-          // Clear input and close menu
-          setMessageText('');
-          setShowMessageMenu(false);
-          setRefresh(prev => prev + 1);
-          
-          if (Platform.OS !== 'web') {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }
-        }
-      } catch (error) {
-        console.error('Error editing message:', error);
-      }
-    }
-  };
-
   const renderMessageItem = ({ item }: { item: Message }) => (
     <TouchableOpacity
       onLongPress={() => {
-        setSelectedMessage(item);
-        setShowMessageMenu(true);
+        setSelectedMessageId(item.id);
+        setShowReactionPicker(true);
       }}
     >
       <MessageBubble
@@ -186,7 +104,7 @@ export default function ChatDetailScreen() {
             </TouchableOpacity>
             <View className="flex-1">
               <Text className="text-lg font-semibold text-foreground">{chatName}</Text>
-              <Text className="text-xs text-success">🟢 {t('common.online')}</Text>
+              <Text className="text-xs text-muted">Online</Text>
             </View>
           </View>
           <View className="flex-row gap-3">
@@ -204,8 +122,8 @@ export default function ChatDetailScreen() {
         {/* Messages List */}
         {messages.length === 0 ? (
           <View className="flex-1 items-center justify-center gap-2">
-            <Text className="text-lg text-muted">{t('chat.noMessages')}</Text>
-            <Text className="text-sm text-muted">{t('chat.startConversation')}</Text>
+            <Text className="text-lg text-muted">No messages yet</Text>
+            <Text className="text-sm text-muted">Start a conversation!</Text>
           </View>
         ) : (
           <FlatList
@@ -229,7 +147,7 @@ export default function ChatDetailScreen() {
 
           <TextInput
             className="flex-1 bg-surface border border-border rounded-full px-4 py-2 text-foreground"
-            placeholder={t('chat.typeMessage')}
+            placeholder="Type a message..."
             placeholderTextColor={colors.muted}
             value={messageText}
             onChangeText={setMessageText}
@@ -247,24 +165,6 @@ export default function ChatDetailScreen() {
           </TouchableOpacity>
         </View>
       </ScreenContainer>
-
-      {/* Message Context Menu */}
-      {selectedMessage && (
-        <MessageContextMenu
-          visible={showMessageMenu}
-          onClose={() => setShowMessageMenu(false)}
-          onDelete={handleDeleteMessage}
-          onEdit={handleEditMessage}
-          onReply={() => setShowMessageMenu(false)}
-          onForward={() => setShowMessageMenu(false)}
-          onReact={() => {
-            setSelectedMessageId(selectedMessage.id);
-            setShowReactionPicker(true);
-            setShowMessageMenu(false);
-          }}
-          isSentByCurrentUser={selectedMessage.senderId === user?.id}
-        />
-      )}
 
       {/* Reaction Picker */}
       <ReactionPicker

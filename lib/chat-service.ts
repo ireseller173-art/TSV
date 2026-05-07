@@ -1,6 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { db } from "./firebase-config";
-import { collection, doc, setDoc, getDoc, getDocs, query, where, orderBy, Timestamp } from "firebase/firestore";
 
 export interface Message {
   id: string;
@@ -13,9 +11,6 @@ export interface Message {
   status: "sending" | "sent" | "delivered" | "read";
   type: "text" | "image" | "voice" | "call";
   reactions: { [emoji: string]: string[] };
-  isEdited?: boolean;
-  editedAt?: number;
-  isDeleted?: boolean;
 }
 
 export interface Chat {
@@ -73,22 +68,6 @@ export const chatService = {
   // Message operations
   async getMessages(chatId: string): Promise<Message[]> {
     try {
-      try {
-        const messagesRef = collection(db, "chats", chatId, "messages");
-        const q = query(messagesRef, orderBy("timestamp", "asc"));
-        const snapshot = await getDocs(q);
-        const messages = snapshot.docs.map(doc => ({
-          ...doc.data(),
-          timestamp: doc.data().timestamp?.toMillis?.() || doc.data().timestamp,
-        })) as Message[];
-        if (messages.length > 0) {
-          await AsyncStorage.setItem(`${MESSAGES_KEY}_${chatId}`, JSON.stringify(messages));
-          return messages;
-        }
-      } catch (firebaseError) {
-        console.warn("Firebase load failed, using local storage:", firebaseError);
-      }
-      
       const data = await AsyncStorage.getItem(`${MESSAGES_KEY}_${chatId}`);
       return data ? JSON.parse(data) : [];
     } catch (error) {
@@ -110,16 +89,6 @@ export const chatService = {
         `${MESSAGES_KEY}_${message.chatId}`,
         JSON.stringify(messages)
       );
-      
-      try {
-        const messageRef = doc(db, "chats", message.chatId, "messages", message.id);
-        await setDoc(messageRef, {
-          ...message,
-          timestamp: Timestamp.fromMillis(message.timestamp),
-        });
-      } catch (firebaseError) {
-        console.warn("Firebase save failed, using local storage:", firebaseError);
-      }
     } catch (error) {
       console.error("Error saving message:", error);
     }
