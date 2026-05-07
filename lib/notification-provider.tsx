@@ -3,11 +3,21 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+import {
+  getNotificationPreferences,
+  updateNotificationPreferences,
+  registerDeviceToken,
+  muteChatNotifications,
+  unmuteChatNotifications,
+  muteGroupNotifications,
+  unmuteGroupNotifications,
+} from './push-notification-service';
+import { NotificationPreferences } from './types/push-notification';
 
 /**
  * Notification types for different events
  */
-export type NotificationType = 'message' | 'call' | 'call_missed' | 'call_ended' | 'reaction';
+export type NotificationType = 'message' | 'call' | 'call_missed' | 'call_ended' | 'reaction' | 'group_message';
 
 /**
  * Notification payload structure
@@ -26,13 +36,20 @@ export interface NotificationPayload {
  */
 interface NotificationContextType {
   expoPushToken: string | null;
+  preferences: NotificationPreferences | null;
   sendMessageNotification: (senderName: string, messagePreview: string, chatId: string, senderId: string) => Promise<void>;
+  sendGroupMessageNotification: (groupName: string, senderName: string, messagePreview: string, groupId: string, senderId: string) => Promise<void>;
   sendIncomingCallNotification: (callerName: string, callerId: string, callId: string) => Promise<void>;
   sendMissedCallNotification: (callerName: string, callerId: string) => Promise<void>;
   sendCallEndedNotification: (callerName: string, duration: number) => Promise<void>;
   sendReactionNotification: (senderName: string, emoji: string, chatId: string) => Promise<void>;
   clearAllNotifications: () => Promise<void>;
   setBadgeCount: (count: number) => Promise<void>;
+  updatePreferences: (prefs: Partial<NotificationPreferences>) => Promise<void>;
+  muteChatNotifications: (chatId: string) => Promise<void>;
+  unmuteChatNotifications: (chatId: string) => Promise<void>;
+  muteGroupNotifications: (groupId: string) => Promise<void>;
+  unmuteGroupNotifications: (groupId: string) => Promise<void>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -40,13 +57,22 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 /**
  * Notification Provider Component
  */
-export function NotificationProvider({ children }: { children: React.ReactNode }) {
+export function NotificationProvider({ children, userId }: { children: React.ReactNode; userId?: string }) {
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
+  const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
 
   useEffect(() => {
     // Initialize notifications
     initializeNotifications();
   }, []);
+
+  useEffect(() => {
+    // Load preferences when userId changes
+    if (userId) {
+      loadPreferences(userId);
+      registerToken(userId);
+    }
+  }, [userId]);
 
   const initializeNotifications = async () => {
     // Set notification handler
@@ -75,6 +101,25 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }
 
     return subscription;
+  };
+
+  const registerToken = async (currentUserId: string) => {
+    try {
+      await registerDeviceToken(currentUserId);
+      console.log('[NotificationProvider] Device token registered');
+    } catch (error) {
+      console.error('[NotificationProvider] Failed to register device token:', error);
+    }
+  };
+
+  const loadPreferences = async (currentUserId: string) => {
+    try {
+      const prefs = await getNotificationPreferences(currentUserId);
+      setPreferences(prefs);
+      console.log('[NotificationProvider] Preferences loaded');
+    } catch (error) {
+      console.error('[NotificationProvider] Failed to load preferences:', error);
+    }
   };
 
   const requestNotificationPermissions = async (): Promise<string | null> => {
@@ -114,12 +159,34 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   const sendLocalNotification = async (payload: NotificationPayload) => {
     try {
+      // Check if notifications are enabled for this type
+      if (!preferences?.enabled) {
+        console.log('[NotificationProvider] Notifications disabled globally');
+        return;
+      }
+
+      // Check notification type preferences
+      if (payload.type === 'message' && !preferences?.messageNotifications) {
+        console.log('[NotificationProvider] Message notifications disabled');
+        return;
+      }
+
+      if (payload.type === 'group_message' && !preferences?.groupMessageNotifications) {
+        console.log('[NotificationProvider] Group message notifications disabled');
+        return;
+      }
+
+      if (payload.type === 'call' && !preferences?.callNotifications) {
+        console.log('[NotificationProvider] Call notifications disabled');
+        return;
+      }
+
       await Notifications.scheduleNotificationAsync({
         content: {
           title: payload.title,
           body: payload.body,
-          sound: payload.sound || 'default',
-          badge: payload.badge || 1,
+          sound: preferences?.soundEnabled ? (payload.sound || 'default') : undefined,
+          badge: preferences?.badgeCountEnabled ? (payload.badge || 1) : undefined,
           data: {
             type: payload.type,
             ...payload.data,
@@ -146,6 +213,27 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         chatId,
         senderId,
         action: 'open_chat',
+      },
+      sound: 'default',
+      badge: 1,
+    });
+  };
+
+  const sendGroupMessageNotification = async (
+    groupName: string,
+    senderName: string,
+    messagePreview: string,
+    groupId: string,
+    senderId: string
+  ) => {
+    return sendLocalNotification({
+      type: 'group_message',
+      title: `${groupName} • ${senderName}`,
+      body: messagePreview,
+      data: {
+        groupId,
+        senderId,
+        action: 'open_group',
       },
       sound: 'default',
       badge: 1,
@@ -231,6 +319,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       case 'open_chat':
         console.log('Navigate to chat:', data.chatId);
         break;
+      case 'open_group':
+        console.log('Navigate to group:', data.groupId);
+        break;
       case 'open_call':
         console.log('Navigate to call:', data.callId);
         break;
@@ -260,15 +351,97 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }
   };
 
+  const updatePreferences = async (prefs: Partial<NotificationPreferences>) => {
+    if (!preferences) {
+      throw new Error('Preferences not initialized');
+    }
+
+    try {
+      const updated = await updateNotificationPreferences(preferences.userId, prefs);
+      setPreferences(updated);
+      console.log('[NotificationProvider] Preferences updated');
+    } catch (error) {
+      console.error('[NotificationProvider] Failed to update preferences:', error);
+      throw error;
+    }
+  };
+
+  const handleMuteChatNotifications = async (chatId: string) => {
+    if (!preferences) {
+      throw new Error('Preferences not initialized');
+    }
+
+    try {
+      await muteChatNotifications(preferences.userId, chatId);
+      const updated = await getNotificationPreferences(preferences.userId);
+      setPreferences(updated);
+    } catch (error) {
+      console.error('[NotificationProvider] Failed to mute chat:', error);
+      throw error;
+    }
+  };
+
+  const handleUnmuteChatNotifications = async (chatId: string) => {
+    if (!preferences) {
+      throw new Error('Preferences not initialized');
+    }
+
+    try {
+      await unmuteChatNotifications(preferences.userId, chatId);
+      const updated = await getNotificationPreferences(preferences.userId);
+      setPreferences(updated);
+    } catch (error) {
+      console.error('[NotificationProvider] Failed to unmute chat:', error);
+      throw error;
+    }
+  };
+
+  const handleMuteGroupNotifications = async (groupId: string) => {
+    if (!preferences) {
+      throw new Error('Preferences not initialized');
+    }
+
+    try {
+      await muteGroupNotifications(preferences.userId, groupId);
+      const updated = await getNotificationPreferences(preferences.userId);
+      setPreferences(updated);
+    } catch (error) {
+      console.error('[NotificationProvider] Failed to mute group:', error);
+      throw error;
+    }
+  };
+
+  const handleUnmuteGroupNotifications = async (groupId: string) => {
+    if (!preferences) {
+      throw new Error('Preferences not initialized');
+    }
+
+    try {
+      await unmuteGroupNotifications(preferences.userId, groupId);
+      const updated = await getNotificationPreferences(preferences.userId);
+      setPreferences(updated);
+    } catch (error) {
+      console.error('[NotificationProvider] Failed to unmute group:', error);
+      throw error;
+    }
+  };
+
   const value: NotificationContextType = {
     expoPushToken,
+    preferences,
     sendMessageNotification,
+    sendGroupMessageNotification,
     sendIncomingCallNotification,
     sendMissedCallNotification,
     sendCallEndedNotification,
     sendReactionNotification,
     clearAllNotifications,
     setBadgeCount,
+    updatePreferences,
+    muteChatNotifications: handleMuteChatNotifications,
+    unmuteChatNotifications: handleUnmuteChatNotifications,
+    muteGroupNotifications: handleMuteGroupNotifications,
+    unmuteGroupNotifications: handleUnmuteGroupNotifications,
   };
 
   return (
