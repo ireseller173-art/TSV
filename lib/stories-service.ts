@@ -7,12 +7,20 @@ export interface Story {
   userName: string;
   userAvatar?: string;
   content: string;
+  caption?: string;
   mediaUrl?: string;
   mediaType?: 'image' | 'video';
   createdAt: number;
   expiresAt: number;
   views: string[]; // userIds who viewed
   isPublic: boolean;
+}
+
+export interface UserStory {
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  stories: Story[];
 }
 
 const STORIES_KEY = 'stories';
@@ -37,18 +45,20 @@ export class StoriesService {
 
       // Save to AsyncStorage
       try {
-        const stories = await this.getAllStories();
+        const stored = await AsyncStorage.getItem(STORIES_KEY);
+        const stories = stored ? JSON.parse(stored) : [];
         stories.push(newStory);
         await AsyncStorage.setItem(STORIES_KEY, JSON.stringify(stories));
       } catch (error) {
         console.warn('AsyncStorage save failed:', error);
       }
 
-      // Save to Firebase
+      // Save to Firebase (optional)
       try {
-        const db = getFirestore();
-        const storiesRef = collection(db, 'stories');
-        await addDoc(storiesRef, newStory);
+        // Firebase save would go here
+        // const db = getFirestore();
+        // const storiesRef = collection(db, 'stories');
+        // await addDoc(storiesRef, newStory);
       } catch (error) {
         console.warn('Firebase save failed:', error);
       }
@@ -61,16 +71,32 @@ export class StoriesService {
   }
 
   /**
-   * Get all active stories
+   * Get all active stories grouped by user
    */
-  static async getAllStories(): Promise<Story[]> {
+  static async getAllStories(): Promise<UserStory[]> {
     try {
       const stored = await AsyncStorage.getItem(STORIES_KEY);
       const stories = stored ? JSON.parse(stored) : [];
       
       // Filter expired stories
       const now = Date.now();
-      return stories.filter((story: Story) => story.expiresAt > now);
+      const active = stories.filter((story: Story) => story.expiresAt > now);
+      
+      // Group by user
+      const grouped: Record<string, UserStory> = {};
+      active.forEach((story: Story) => {
+        if (!grouped[story.userId]) {
+          grouped[story.userId] = {
+            userId: story.userId,
+            userName: story.userName,
+            userAvatar: story.userAvatar,
+            stories: [],
+          };
+        }
+        grouped[story.userId].stories.push(story);
+      });
+      
+      return Object.values(grouped);
     } catch (error) {
       console.error('Error getting stories:', error);
       return [];
@@ -78,12 +104,25 @@ export class StoriesService {
   }
 
   /**
+   * Get time remaining for story (in seconds)
+   */
+  static getTimeRemaining(createdAt: number): number {
+    const now = Date.now();
+    const elapsed = now - createdAt;
+    const remaining = Math.max(0, STORY_EXPIRY_TIME - elapsed);
+    return Math.floor(remaining / 1000); // Convert to seconds
+  }
+
+  /**
    * Get stories from specific user
    */
   static async getUserStories(userId: string): Promise<Story[]> {
     try {
-      const stories = await this.getAllStories();
-      return stories.filter((story) => story.userId === userId);
+      const stored = await AsyncStorage.getItem(STORIES_KEY);
+      const stories = stored ? JSON.parse(stored) : [];
+      
+      const now = Date.now();
+      return stories.filter((story: Story) => story.userId === userId && story.expiresAt > now);
     } catch (error) {
       console.error('Error getting user stories:', error);
       return [];
@@ -95,8 +134,9 @@ export class StoriesService {
    */
   static async addStoryView(storyId: string, userId: string): Promise<boolean> {
     try {
-      const stories = await this.getAllStories();
-      const story = stories.find((s) => s.id === storyId);
+      const stored = await AsyncStorage.getItem(STORIES_KEY);
+      const stories = stored ? JSON.parse(stored) : [];
+      const story = stories.find((s: Story) => s.id === storyId);
       
       if (story && !story.views.includes(userId)) {
         story.views.push(userId);
@@ -115,8 +155,9 @@ export class StoriesService {
    */
   static async deleteStory(storyId: string): Promise<boolean> {
     try {
-      const stories = await this.getAllStories();
-      const filtered = stories.filter((s) => s.id !== storyId);
+      const stored = await AsyncStorage.getItem(STORIES_KEY);
+      const stories = stored ? JSON.parse(stored) : [];
+      const filtered = stories.filter((s: Story) => s.id !== storyId);
       await AsyncStorage.setItem(STORIES_KEY, JSON.stringify(filtered));
       return true;
     } catch (error) {
@@ -130,10 +171,10 @@ export class StoriesService {
    */
   static async cleanupExpiredStories(): Promise<number> {
     try {
-      const stories = await AsyncStorage.getItem(STORIES_KEY);
-      if (!stories) return 0;
+      const stored = await AsyncStorage.getItem(STORIES_KEY);
+      if (!stored) return 0;
       
-      const allStories = JSON.parse(stories);
+      const allStories = JSON.parse(stored);
       const now = Date.now();
       const active = allStories.filter((s: Story) => s.expiresAt > now);
       const expired = allStories.length - active.length;
