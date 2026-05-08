@@ -227,7 +227,6 @@ export default function ChatDetailScreen() {
         onSend={() => {
           // Send media message
           if (selectedMedia && user) {
-            console.log("Sending media:", selectedMedia.fileName);
             setShowMediaPreview(false);
             setSelectedMedia(null);
             setMediaCaption("");

@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import { Message } from "@/lib/chat-service";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
+import { MessageStatusIndicator } from "@/components/message-status-indicator";
 
 interface MessageBubbleProps {
   message: Message;
@@ -76,13 +77,7 @@ export function MessageBubble({
             })}
           </Text>
           {isOwn && (
-            <Text
-              className={`text-xs ${
-                message.status === "read" ? "text-primary" : "text-muted"
-              }`}
-            >
-              {getStatusIcon()}
-            </Text>
+            <MessageStatusIndicator status={message.status || 'sent'} isOwn={true} size="small" />
           )}
         </View>
 

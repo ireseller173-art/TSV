@@ -7,11 +7,13 @@ import {
   TextInput,
   Image,
   ActivityIndicator,
+  Share,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
+import { invitationService } from "@/lib/invitation-service";
 
 interface Contact {
   id: string;
@@ -113,10 +115,33 @@ export default function ContactsScreen() {
     </TouchableOpacity>
   );
 
+   const handleInviteFriend = async () => {
+    try {
+      const invitation = await invitationService.createInvitation('current-user-id');
+      const invitationLink = invitationService.generateInvitationLink(invitation.token);
+      
+      await Share.share({
+        message: `Join me on TSV Keeper! ${invitationLink}`,
+        title: 'Invite a friend to TSV Keeper',
+        url: invitationLink,
+      });
+    } catch (error) {
+      console.error('Error sharing invitation:', error);
+    }
+  };
+
   return (
     <ScreenContainer className="flex-1 gap-4" edges={["top", "left", "right"]}>
       <View className="px-4 pt-4 gap-4">
-        <Text className="text-2xl font-bold text-foreground">Contacts</Text>
+        <View className="flex-row items-center justify-between">
+          <Text className="text-2xl font-bold text-foreground">Contacts</Text>
+          <TouchableOpacity
+            onPress={handleInviteFriend}
+            className="bg-primary rounded-full w-10 h-10 items-center justify-center"
+          >
+            <IconSymbol name="paperplane.fill" size={18} color="white" />
+          </TouchableOpacity>
+        </View>
 
         <View className="flex-row items-center gap-2 bg-surface border border-border rounded-lg px-3 py-2">
           <IconSymbol name="magnifyingglass" size={18} color={colors.muted} />

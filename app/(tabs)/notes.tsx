@@ -17,6 +17,7 @@ import { NotesService, type Note } from '@/lib/notes-service';
 import { useI18n } from '@/lib/i18n-provider';
 import { cn } from '@/lib/utils';
 import { useFocusEffect } from '@react-navigation/native';
+import { NoteItem } from '@/components/note-item';
 
 export default function NotesScreen() {
   const colors = useColors();
@@ -110,36 +111,13 @@ export default function NotesScreen() {
       note.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const renderNoteItem = ({ item }: { item: Note }) => {
-    const { scaleValue, onPressIn, onPressOut } = useTactileFeedback();
-
-    return (
-      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-        <Pressable
-          onPressIn={onPressIn}
-          onPressOut={onPressOut}
-          onPress={() => handleEditNote(item)}
-          className="bg-surface rounded-lg p-4 mb-3 border border-border"
-        >
-          <View className="flex-row justify-between items-start mb-2">
-            <View className="flex-1">
-              <Text className="text-lg font-semibold text-foreground">{item.title}</Text>
-              <Text className="text-sm text-muted mt-1">
-                {item.date} {item.time}
-              </Text>
-            </View>
-            <Pressable
-              onPress={() => handleDeleteNote(item.id)}
-              className="ml-2 p-2"
-            >
-              <Text className="text-error text-lg">✕</Text>
-            </Pressable>
-          </View>
-          <Text className="text-sm text-foreground line-clamp-2">{item.content}</Text>
-        </Pressable>
-      </Animated.View>
-    );
-  };
+  const renderNoteItem = ({ item }: { item: Note }) => (
+    <NoteItem
+      item={item}
+      onEdit={handleEditNote}
+      onDelete={handleDeleteNote}
+    />
+  );
 
   return (
     <ScreenContainer className="p-4">

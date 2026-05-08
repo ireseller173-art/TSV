@@ -14,21 +14,43 @@ import { useColors } from "@/hooks/use-colors";
 import { useAuth } from "@/lib/auth-provider";
 import { useI18n } from "@/lib/i18n-provider";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeContext } from "@/lib/theme-provider";
+import * as ImagePicker from 'expo-image-picker';
+import { avatarService } from "@/lib/avatar-service";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const colors = useColors();
   const { user, signOut } = useAuth();
-  const { t } = useI18n();
+  const { t, language, setLanguage } = useI18n();
   const colorScheme = useColorScheme();
+  const { setColorScheme } = useThemeContext();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkModeEnabled, setDarkModeEnabled] = useState(colorScheme === 'dark');
+  const [avatarUri, setAvatarUri] = useState(user?.avatar || '');
 
   const handleThemeToggle = (value: boolean) => {
     setDarkModeEnabled(value);
-    // TODO: Integrate with theme-provider to actually change theme
-    if (typeof document !== 'undefined') {
-      document.documentElement.setAttribute('data-theme', value ? 'dark' : 'light');
+    setColorScheme(value ? 'dark' : 'light');
+  };
+
+  const handleAvatarPick = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const uri = result.assets[0].uri;
+        setAvatarUri(uri);
+        // Note: Avatar upload to Firebase Storage would be implemented in avatar-service
+        // For now, just update local state
+      }
+    } catch (error) {
+      console.error('Error picking avatar:', error);
     }
   };
 
@@ -44,10 +66,15 @@ export default function ProfileScreen() {
         <View className="gap-6">
           {/* Profile Header */}
           <View className="items-center gap-4">
-            <Image
-              source={{ uri: user?.avatar }}
-              className="w-24 h-24 rounded-full border-4 border-primary"
-            />
+            <TouchableOpacity onPress={handleAvatarPick}>
+              <Image
+                source={{ uri: avatarUri || user?.avatar }}
+                className="w-24 h-24 rounded-full border-4 border-primary"
+              />
+              <View className="absolute bottom-0 right-0 bg-primary rounded-full p-2">
+                <IconSymbol name="pencil" size={14} color="white" />
+              </View>
+            </TouchableOpacity>
             <View className="items-center gap-1">
               <Text className="text-2xl font-bold text-foreground">{user?.name}</Text>
               <Text className="text-sm text-muted">{user?.email}</Text>
@@ -66,13 +93,13 @@ export default function ProfileScreen() {
 
           {/* Settings Section */}
           <View className="gap-3">
-            <Text className="text-xs font-semibold text-muted uppercase px-2">{t('chat.moreOptions')}</Text>
+            <Text className="text-xs font-semibold text-muted uppercase px-2">{t('settings.title')}</Text>
 
             {/* Notifications */}
             <View className="bg-surface rounded-lg p-4 flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">
                 <IconSymbol name="bell.fill" size={20} color={colors.primary} />
-                <Text className="text-base text-foreground">{t('chat.moreOptions')}</Text>
+                <Text className="text-base text-foreground">{t('settings.notifications')}</Text>
               </View>
               <Switch
                 value={notificationsEnabled}
@@ -85,7 +112,7 @@ export default function ProfileScreen() {
             <View className="bg-surface rounded-lg p-4 flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">
                 <IconSymbol name="moon.fill" size={20} color={colors.primary} />
-                <Text className="text-base text-foreground">{t('chat.moreOptions')}</Text>
+                <Text className="text-base text-foreground">{t('profile.theme')}</Text>
               </View>
               <Switch
                 value={darkModeEnabled}
@@ -94,11 +121,37 @@ export default function ProfileScreen() {
               />
             </View>
 
+            {/* Language */}
+            <View className="bg-surface rounded-lg p-4 flex-row items-center justify-between">
+              <View className="flex-row items-center gap-3">
+                <IconSymbol name="globe" size={20} color={colors.primary} />
+                <Text className="text-base text-foreground">{t('profile.language')}</Text>
+              </View>
+              <View className="flex-row gap-2">
+                <TouchableOpacity
+                  onPress={() => setLanguage('en')}
+                  className={`px-3 py-1 rounded ${language === 'en' ? 'bg-primary' : 'bg-border'}`}
+                >
+                  <Text className={language === 'en' ? 'text-white text-xs font-semibold' : 'text-foreground text-xs'}>
+                    EN
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setLanguage('ru')}
+                  className={`px-3 py-1 rounded ${language === 'ru' ? 'bg-primary' : 'bg-border'}`}
+                >
+                  <Text className={language === 'ru' ? 'text-white text-xs font-semibold' : 'text-foreground text-xs'}>
+                    РУ
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
             {/* Privacy */}
             <TouchableOpacity className="bg-surface rounded-lg p-4 flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">
                 <IconSymbol name="lock.fill" size={20} color={colors.primary} />
-                <Text className="text-base text-foreground">{t('chat.moreOptions')}</Text>
+                <Text className="text-base text-foreground">{t('profile.privacy')}</Text>
               </View>
               <IconSymbol name="chevron.right" size={20} color={colors.muted} />
             </TouchableOpacity>
@@ -122,7 +175,7 @@ export default function ProfileScreen() {
             <TouchableOpacity className="bg-surface rounded-lg p-4 flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">
                 <IconSymbol name="questionmark.circle.fill" size={20} color={colors.primary} />
-                <Text className="text-base text-foreground">{t('chat.moreOptions')}</Text>
+                <Text className="text-base text-foreground">Help</Text>
               </View>
               <IconSymbol name="chevron.right" size={20} color={colors.muted} />
             </TouchableOpacity>
@@ -131,7 +184,7 @@ export default function ProfileScreen() {
             <TouchableOpacity className="bg-surface rounded-lg p-4 flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">
                 <IconSymbol name="info.circle.fill" size={20} color={colors.primary} />
-                <Text className="text-base text-foreground">{t('chat.moreOptions')}</Text>
+                <Text className="text-base text-foreground">About</Text>
               </View>
               <IconSymbol name="chevron.right" size={20} color={colors.muted} />
             </TouchableOpacity>
@@ -142,7 +195,7 @@ export default function ProfileScreen() {
             onPress={handleSignOut}
             className="bg-error rounded-lg py-3 items-center justify-center mt-4"
           >
-            <Text className="text-white font-semibold text-base">{t('auth.loginButton')}</Text>
+            <Text className="text-white font-semibold text-base">{t('profile.logout')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
