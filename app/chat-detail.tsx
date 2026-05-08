@@ -22,11 +22,14 @@ import { useAuth } from "@/lib/auth-provider";
 import { useChat } from "@/hooks/use-chat";
 import Haptics from "expo-haptics";
 import { Message } from "@/lib/chat-service";
+import { useI18n } from "@/lib/i18n-provider";
+import { MessageStatusIndicator } from "@/components/message-status-indicator";
 
 export default function ChatDetailScreen() {
   const router = useRouter();
   const colors = useColors();
   const { user } = useAuth();
+  const { t } = useI18n();
   const { chatId = "1", chatName = "Chat" } = useLocalSearchParams<{
     chatId: string;
     chatName: string;
@@ -40,6 +43,8 @@ export default function ChatDetailScreen() {
   const [showMediaPreview, setShowMediaPreview] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<any>(null);
   const [mediaCaption, setMediaCaption] = useState("");
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState("");
   const flatListRef = useRef<FlatList>(null);
 
   // Scroll to bottom when new messages arrive
@@ -76,18 +81,36 @@ export default function ChatDetailScreen() {
   };
 
   const renderMessageItem = ({ item }: { item: Message }) => (
-    <TouchableOpacity
-      onLongPress={() => {
-        setSelectedMessageId(item.id);
-        setShowReactionPicker(true);
-      }}
-    >
-      <MessageBubble
-        message={item}
-        isOwn={item.senderId === user?.id}
-        onReaction={(emoji) => handleReaction(emoji)}
-      />
-    </TouchableOpacity>
+    <View className="flex-row items-end gap-2 px-4 py-1">
+      <TouchableOpacity
+        onLongPress={() => {
+          setSelectedMessageId(item.id);
+          setShowReactionPicker(true);
+        }}
+        className="flex-1"
+      >
+        <MessageBubble
+          message={item}
+          isOwn={item.senderId === user?.id}
+          onReaction={(emoji) => handleReaction(emoji)}
+        />
+      </TouchableOpacity>
+      {item.senderId === user?.id && (
+        <View className="flex-row gap-1">
+          <MessageStatusIndicator status={item.status || 'sent'} />
+          <TouchableOpacity
+            onPress={() => {
+              setEditingMessageId(item.id);
+              setEditingText(item.text);
+              setMessageText(item.text);
+            }}
+            className="bg-primary/10 rounded-full w-8 h-8 items-center justify-center"
+          >
+            <IconSymbol name="pencil" size={14} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
+      )}
+    </View>
   );
 
   return (
@@ -104,7 +127,7 @@ export default function ChatDetailScreen() {
             </TouchableOpacity>
             <View className="flex-1">
               <Text className="text-lg font-semibold text-foreground">{chatName}</Text>
-              <Text className="text-xs text-muted">Online</Text>
+              <Text className="text-xs text-muted">{t('chat.online')}</Text>
             </View>
           </View>
           <View className="flex-row gap-3">
@@ -122,8 +145,8 @@ export default function ChatDetailScreen() {
         {/* Messages List */}
         {messages.length === 0 ? (
           <View className="flex-1 items-center justify-center gap-2">
-            <Text className="text-lg text-muted">No messages yet</Text>
-            <Text className="text-sm text-muted">Start a conversation!</Text>
+            <Text className="text-lg text-muted">{t('chat.newMessage')}</Text>
+            <Text className="text-sm text-muted">{t('chat.typeMessage')}</Text>
           </View>
         ) : (
           <FlatList
@@ -142,18 +165,29 @@ export default function ChatDetailScreen() {
             onPress={() => setShowMediaPicker(true)}
             className="bg-primary rounded-full w-10 h-10 items-center justify-center"
           >
-            <IconSymbol name="plus" size={20} color="white" />
+            <IconSymbol name="paperclip" size={20} color="white" />
           </TouchableOpacity>
 
           <TextInput
             className="flex-1 bg-surface border border-border rounded-full px-4 py-2 text-foreground"
-            placeholder="Type a message..."
+            placeholder={t('chat.typeMessage')}
             placeholderTextColor={colors.muted}
             value={messageText}
             onChangeText={setMessageText}
             multiline
             style={{ maxHeight: 100 }}
           />
+          {editingMessageId && (
+            <TouchableOpacity
+              onPress={() => {
+                setEditingMessageId(null);
+                setEditingText("");
+              }}
+              className="bg-error rounded-full w-10 h-10 items-center justify-center"
+            >
+              <IconSymbol name="xmark" size={18} color="white" />
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
             onPress={handleSendMessage}
