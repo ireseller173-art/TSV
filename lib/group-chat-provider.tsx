@@ -265,7 +265,6 @@ export function GroupChatProvider({ children }: { children: React.ReactNode }) {
       try {
         await groupChatService.markGroupMessagesAsRead(groupId, userId);
       } catch (err) {
-        console.error('Failed to mark messages as read:', err);
       }
     },
     []

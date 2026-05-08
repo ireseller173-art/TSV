@@ -17,7 +17,7 @@ import { Image } from 'expo-image';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/use-colors';
 import { cn } from '@/lib/utils';
-import { FileMetadata, FileType } from '@/lib/types/file-sharing';
+import { FileMetadata, FileType } from '@/lib/file-sharing-service';
 import { formatFileSize } from '@/lib/file-sharing-service';
 
 interface FilePreviewModalProps {

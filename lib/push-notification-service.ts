@@ -28,7 +28,6 @@ export async function configureNotifications(): Promise<void> {
   // Set notification handler
   Notifications.setNotificationHandler({
     handleNotification: async (notification) => {
-      console.log('[Notifications] Received notification:', notification);
       return {
         shouldShowAlert: true,
         shouldPlaySound: true,
@@ -48,7 +47,6 @@ export async function configureNotifications(): Promise<void> {
  */
 export async function requestNotificationPermissions(): Promise<NotificationPermissionResult> {
   try {
-    console.log('[Notifications] Requesting permissions...');
 
     const { status } = await Notifications.requestPermissionsAsync({
       ios: {
@@ -68,7 +66,6 @@ export async function requestNotificationPermissions(): Promise<NotificationPerm
 
     const permissionStatus = statusMap[status] || 'default';
 
-    console.log('[Notifications] Permission status:', permissionStatus);
 
     return {
       status: permissionStatus,
@@ -76,7 +73,6 @@ export async function requestNotificationPermissions(): Promise<NotificationPerm
       timestamp: Date.now(),
     };
   } catch (error) {
-    console.error('[Notifications] Failed to request permissions:', error);
     throw error;
   }
 }
@@ -86,20 +82,16 @@ export async function requestNotificationPermissions(): Promise<NotificationPerm
  */
 export async function getDevicePushToken(): Promise<string | null> {
   try {
-    console.log('[Notifications] Getting device push token...');
 
     // For web, we can't get a real push token
     if (Platform.OS === 'web') {
-      console.log('[Notifications] Web platform - using mock token');
       return `web-${Date.now()}`;
     }
 
     const token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log('[Notifications] Device push token:', token.substring(0, 20) + '...');
 
     return token;
   } catch (error) {
-    console.error('[Notifications] Failed to get device push token:', error);
     return null;
   }
 }
@@ -112,7 +104,6 @@ export async function registerDeviceToken(
   deviceName: string = 'Unknown Device'
 ): Promise<DeviceToken> {
   try {
-    console.log('[Notifications] Registering device token for user:', userId);
 
     const token = await getDevicePushToken();
     if (!token) {
@@ -139,10 +130,8 @@ export async function registerDeviceToken(
       JSON.stringify(tokens)
     );
 
-    console.log('[Notifications] Device token registered:', deviceToken.id);
     return deviceToken;
   } catch (error) {
-    console.error('[Notifications] Failed to register device token:', error);
     throw error;
   }
 }
@@ -155,7 +144,6 @@ export async function getDeviceTokens(userId: string): Promise<DeviceToken[]> {
     const data = await AsyncStorage.getItem(`${DEVICE_TOKENS_KEY}_${userId}`);
     return data ? JSON.parse(data) : [];
   } catch (error) {
-    console.error('[Notifications] Failed to get device tokens:', error);
     return [];
   }
 }
@@ -171,9 +159,7 @@ export async function removeDeviceToken(userId: string, tokenId: string): Promis
       `${DEVICE_TOKENS_KEY}_${userId}`,
       JSON.stringify(filtered)
     );
-    console.log('[Notifications] Device token removed:', tokenId);
   } catch (error) {
-    console.error('[Notifications] Failed to remove device token:', error);
     throw error;
   }
 }
@@ -194,7 +180,6 @@ export async function getNotificationPreferences(
     // Return default preferences
     return getDefaultNotificationPreferences(userId);
   } catch (error) {
-    console.error('[Notifications] Failed to get notification preferences:', error);
     return getDefaultNotificationPreferences(userId);
   }
 }
@@ -251,10 +236,8 @@ export async function updateNotificationPreferences(
       JSON.stringify(updated)
     );
 
-    console.log('[Notifications] Preferences updated for user:', userId);
     return updated;
   } catch (error) {
-    console.error('[Notifications] Failed to update notification preferences:', error);
     throw error;
   }
 }
@@ -295,7 +278,6 @@ export async function isNotificationEnabledForChat(
 
     return true;
   } catch (error) {
-    console.error('[Notifications] Failed to check notification enabled:', error);
     return false;
   }
 }
@@ -322,7 +304,6 @@ export async function sendLocalNotification(
   notification: PushNotificationPayload
 ): Promise<string> {
   try {
-    console.log('[Notifications] Sending local notification:', notification.title);
 
     const notificationId = await Notifications.scheduleNotificationAsync({
       content: {
@@ -340,7 +321,6 @@ export async function sendLocalNotification(
 
     return notificationId;
   } catch (error) {
-    console.error('[Notifications] Failed to send local notification:', error);
     throw error;
   }
 }
@@ -372,7 +352,6 @@ export async function addNotificationToHistory(
       JSON.stringify(limited)
     );
   } catch (error) {
-    console.error('[Notifications] Failed to add notification to history:', error);
   }
 }
 
@@ -384,7 +363,6 @@ export async function getNotificationHistory(userId: string): Promise<Notificati
     const data = await AsyncStorage.getItem(`${NOTIFICATION_HISTORY_KEY}_${userId}`);
     return data ? JSON.parse(data) : [];
   } catch (error) {
-    console.error('[Notifications] Failed to get notification history:', error);
     return [];
   }
 }
@@ -408,7 +386,6 @@ export async function markNotificationAsRead(
       );
     }
   } catch (error) {
-    console.error('[Notifications] Failed to mark notification as read:', error);
   }
 }
 
@@ -428,9 +405,7 @@ export async function muteChatNotifications(
     }
 
     await updateNotificationPreferences(userId, prefs);
-    console.log('[Notifications] Chat muted:', chatId);
   } catch (error) {
-    console.error('[Notifications] Failed to mute chat notifications:', error);
     throw error;
   }
 }
@@ -447,9 +422,7 @@ export async function unmuteChatNotifications(
     prefs.mutedChatIds = prefs.mutedChatIds.filter((id) => id !== chatId);
 
     await updateNotificationPreferences(userId, prefs);
-    console.log('[Notifications] Chat unmuted:', chatId);
   } catch (error) {
-    console.error('[Notifications] Failed to unmute chat notifications:', error);
     throw error;
   }
 }
@@ -470,9 +443,7 @@ export async function muteGroupNotifications(
     }
 
     await updateNotificationPreferences(userId, prefs);
-    console.log('[Notifications] Group muted:', groupId);
   } catch (error) {
-    console.error('[Notifications] Failed to mute group notifications:', error);
     throw error;
   }
 }
@@ -489,9 +460,7 @@ export async function unmuteGroupNotifications(
     prefs.mutedGroupIds = prefs.mutedGroupIds.filter((id) => id !== groupId);
 
     await updateNotificationPreferences(userId, prefs);
-    console.log('[Notifications] Group unmuted:', groupId);
   } catch (error) {
-    console.error('[Notifications] Failed to unmute group notifications:', error);
     throw error;
   }
 }
@@ -502,9 +471,7 @@ export async function unmuteGroupNotifications(
 export async function clearAllNotifications(): Promise<void> {
   try {
     await Notifications.dismissAllNotificationsAsync();
-    console.log('[Notifications] All notifications cleared');
   } catch (error) {
-    console.error('[Notifications] Failed to clear notifications:', error);
     throw error;
   }
 }
@@ -516,10 +483,8 @@ export async function setBadgeCount(count: number): Promise<void> {
   try {
     if (Platform.OS !== 'web') {
       await Notifications.setBadgeCountAsync(count);
-      console.log('[Notifications] Badge count set to:', count);
     }
   } catch (error) {
-    console.error('[Notifications] Failed to set badge count:', error);
   }
 }
 
@@ -533,7 +498,6 @@ export async function getBadgeCount(): Promise<number> {
     }
     return 0;
   } catch (error) {
-    console.error('[Notifications] Failed to get badge count:', error);
     return 0;
   }
 }

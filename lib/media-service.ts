@@ -42,7 +42,6 @@ export const mediaService = {
       const camera = await ImagePicker.requestCameraPermissionsAsync();
       return cameraRoll.granted && camera.granted;
     } catch (error) {
-      console.error("Error requesting permissions:", error);
       return false;
     }
   },
@@ -63,7 +62,6 @@ export const mediaService = {
       }
       return null;
     } catch (error) {
-      console.error("Error picking image:", error);
       return null;
     }
   },
@@ -83,7 +81,6 @@ export const mediaService = {
       }
       return null;
     } catch (error) {
-      console.error("Error picking video:", error);
       return null;
     }
   },
@@ -103,7 +100,6 @@ export const mediaService = {
       }
       return null;
     } catch (error) {
-      console.error("Error taking photo:", error);
       return null;
     }
   },
@@ -133,7 +129,6 @@ export const mediaService = {
         mimeType,
       };
     } catch (error) {
-      console.error("Error creating media file:", error);
       throw error;
     }
   },
@@ -178,7 +173,6 @@ export const mediaService = {
       });
       return base64;
     } catch (error) {
-      console.error("Error converting to base64:", error);
       throw error;
     }
   },
@@ -197,7 +191,6 @@ export const mediaService = {
     try {
       await FileSystem.deleteAsync(uri);
     } catch (error) {
-      console.error("Error deleting media file:", error);
     }
   },
 
@@ -208,7 +201,6 @@ export const mediaService = {
       // For now, we'll return null
       return null;
     } catch (error) {
-      console.error("Error getting video thumbnail:", error);
       return null;
     }
   },

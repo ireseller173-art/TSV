@@ -50,7 +50,6 @@ export class NotesService {
       const notes = JSON.parse(data) as Note[];
       return notes.sort((a, b) => b.createdAt - a.createdAt);
     } catch (error) {
-      console.error('Error getting notes:', error);
       return [];
     }
   }
@@ -138,7 +137,6 @@ export class NotesService {
       await AsyncStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes));
       return true;
     } catch (error) {
-      console.error('Error importing notes:', error);
       return false;
     }
   }

@@ -64,7 +64,6 @@ export function ContactSyncProvider({ children }: { children: React.ReactNode })
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to initialize contacts';
       setError(errorMessage);
-      console.error('Error initializing contacts:', err);
     } finally {
       setIsLoading(false);
     }
@@ -88,7 +87,6 @@ export function ContactSyncProvider({ children }: { children: React.ReactNode })
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to sync contacts';
       setError(errorMessage);
-      console.error('Error syncing contacts:', err);
     } finally {
       setIsSyncing(false);
     }
@@ -102,7 +100,6 @@ export function ContactSyncProvider({ children }: { children: React.ReactNode })
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to refresh contacts';
       setError(errorMessage);
-      console.error('Error refreshing contacts:', err);
     } finally {
       setIsLoading(false);
     }
@@ -124,7 +121,6 @@ export function ContactSyncProvider({ children }: { children: React.ReactNode })
     try {
       return await searchContacts(query);
     } catch (err) {
-      console.error('Error searching contacts:', err);
       return [];
     }
   }, []);

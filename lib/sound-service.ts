@@ -234,7 +234,6 @@ export const soundService = {
     try {
       return JSON.parse(jsonString);
     } catch (error) {
-      console.error('Error parsing preferences:', error);
       return null;
     }
   },
@@ -305,7 +304,6 @@ export const soundService = {
    */
   setVolume(preferences: SoundPreference, volume: number): SoundPreference {
     if (!this.validateVolume(volume)) {
-      console.error('Invalid volume level:', volume);
       return preferences;
     }
     return this.updateSoundPreference(preferences, { volume });

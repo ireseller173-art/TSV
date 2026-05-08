@@ -31,7 +31,6 @@ export function CallProvider({ children }: { children: React.ReactNode }) {
     (recipientId: string, recipientName: string, recipientAvatar: string) => {
       // This would be called by the user initiating a call
       // In a real app, this would send a signal to the recipient
-      console.log(`Initiating call to ${recipientName}`);
       // For now, we'll just set up the local call session
       // The actual WebRTC connection would be established here
     },

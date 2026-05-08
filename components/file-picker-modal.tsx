@@ -19,7 +19,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/use-colors';
 import { cn } from '@/lib/utils';
-import { FileMetadata, FilePickerOptions, FilePickerResult } from '@/lib/types/file-sharing';
+import { FileMetadata, FilePickerOptions, FilePickerResult } from '@/lib/file-sharing-service';
 import { validateFile } from '@/lib/file-sharing-service';
 
 interface FilePickerModalProps {

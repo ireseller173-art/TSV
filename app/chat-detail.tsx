@@ -18,7 +18,7 @@ import { CallButton } from "@/components/call-button";
 import { MediaPicker } from "@/components/media-picker";
 import { MediaPreview } from "@/components/media-preview";
 import { useColors } from "@/hooks/use-colors";
-import { useAuth } from "@/lib/auth-provider";
+import { useFirebaseAuth as useAuth } from "@/lib/firebase-auth-provider";
 import { useChat } from "@/hooks/use-chat";
 import Haptics from "expo-haptics";
 import { Message } from "@/lib/chat-service";

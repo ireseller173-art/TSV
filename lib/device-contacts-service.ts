@@ -34,7 +34,6 @@ export async function requestContactsPermission(): Promise<boolean> {
     const { status } = await Contacts.requestPermissionsAsync();
     return status === 'granted';
   } catch (error) {
-    console.error('Error requesting contacts permission:', error);
     return false;
   }
 }
@@ -47,7 +46,6 @@ export async function hasContactsPermission(): Promise<boolean> {
     const { status } = await Contacts.getPermissionsAsync();
     return status === 'granted';
   } catch (error) {
-    console.error('Error checking contacts permission:', error);
     return false;
   }
 }
@@ -86,7 +84,6 @@ export async function getDeviceContacts(): Promise<DeviceContact[]> {
       }))
       .filter((contact: DeviceContact) => contact.phoneNumbers.length > 0 || contact.emails.length > 0);
   } catch (error) {
-    console.error('Error getting device contacts:', error);
     return [];
   }
 }
@@ -130,7 +127,6 @@ export async function saveContactsLocally(contacts: DeviceContact[]): Promise<vo
     const deduplicated = deduplicateContacts(contacts);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(deduplicated));
   } catch (error) {
-    console.error('Error saving contacts locally:', error);
   }
 }
 
@@ -142,7 +138,6 @@ export async function getLocalContacts(): Promise<DeviceContact[]> {
     const data = await AsyncStorage.getItem(STORAGE_KEY);
     return data ? JSON.parse(data) : [];
   } catch (error) {
-    console.error('Error getting local contacts:', error);
     return [];
   }
 }
@@ -197,7 +192,6 @@ export async function syncDeviceContacts(): Promise<SyncResult> {
 
     return result;
   } catch (error) {
-    console.error('Error syncing device contacts:', error);
     return {
       imported: 0,
       updated: 0,
@@ -221,7 +215,6 @@ async function saveSyncHistory(result: SyncResult): Promise<void> {
     }
     await AsyncStorage.setItem(SYNC_HISTORY_KEY, JSON.stringify(syncHistory));
   } catch (error) {
-    console.error('Error saving sync history:', error);
   }
 }
 
@@ -233,7 +226,6 @@ export async function getLastSyncTime(): Promise<number | null> {
     const timestamp = await AsyncStorage.getItem(LAST_SYNC_KEY);
     return timestamp ? parseInt(timestamp, 10) : null;
   } catch (error) {
-    console.error('Error getting last sync time:', error);
     return null;
   }
 }
@@ -246,7 +238,6 @@ export async function getSyncHistory(): Promise<SyncResult[]> {
     const history = await AsyncStorage.getItem(SYNC_HISTORY_KEY);
     return history ? JSON.parse(history) : [];
   } catch (error) {
-    console.error('Error getting sync history:', error);
     return [];
   }
 }
@@ -266,7 +257,6 @@ export async function searchContacts(query: string): Promise<DeviceContact[]> {
         contact.emails.some((e) => e.toLowerCase().includes(lowerQuery))
     );
   } catch (error) {
-    console.error('Error searching contacts:', error);
     return [];
   }
 }
@@ -278,7 +268,6 @@ export async function clearLocalContacts(): Promise<void> {
   try {
     await AsyncStorage.removeItem(STORAGE_KEY);
   } catch (error) {
-    console.error('Error clearing local contacts:', error);
   }
 }
 
@@ -298,7 +287,6 @@ export async function exportContactsAsCSV(): Promise<string> {
 
     return csv;
   } catch (error) {
-    console.error('Error exporting contacts:', error);
     return '';
   }
 }
@@ -317,6 +305,5 @@ export async function setupAutoSync(): Promise<void> {
       await syncDeviceContacts();
     }
   } catch (error) {
-    console.error('Error setting up auto sync:', error);
   }
 }

@@ -91,7 +91,6 @@ export const callService = {
       const recentHistory = history.slice(-100);
       await AsyncStorage.setItem(CALL_HISTORY_KEY, JSON.stringify(recentHistory));
     } catch (error) {
-      console.error("Error saving call to history:", error);
     }
   },
 
@@ -101,7 +100,6 @@ export const callService = {
       const data = await AsyncStorage.getItem(CALL_HISTORY_KEY);
       return data ? JSON.parse(data) : [];
     } catch (error) {
-      console.error("Error getting call history:", error);
       return [];
     }
   },
@@ -112,7 +110,6 @@ export const callService = {
       const history = await this.getCallHistory();
       return history.filter((call) => call.type === "missed");
     } catch (error) {
-      console.error("Error getting missed calls:", error);
       return [];
     }
   },
@@ -122,7 +119,6 @@ export const callService = {
     try {
       await AsyncStorage.removeItem(CALL_HISTORY_KEY);
     } catch (error) {
-      console.error("Error clearing call history:", error);
     }
   },
 
@@ -134,7 +130,6 @@ export const callService = {
         (call) => call.callerId === userId || call.recipientId === userId
       );
     } catch (error) {
-      console.error("Error getting calls with user:", error);
       return [];
     }
   },

@@ -14,7 +14,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useGroupChat } from '@/lib/group-chat-provider';
-import { useAuth } from '@/hooks/use-auth';
+import { useFirebaseAuth as useAuth } from '@/lib/firebase-auth-provider';
 import { useColors } from '@/hooks/use-colors';
 import { GroupMember, GroupMemberRole } from '@/lib/types/group-chat';
 import * as Haptics from 'expo-haptics';

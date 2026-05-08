@@ -226,7 +226,6 @@ export const avatarService = {
    */
   async deleteAvatar(userId: string): Promise<void> {
     // Implementation would delete from Firebase Storage
-    console.log(`Deleting avatar for user: ${userId}`);
   },
 
   /**

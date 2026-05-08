@@ -34,7 +34,6 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
           setLanguageState('en');
         }
       } catch (error) {
-        console.error('Error loading language preference:', error);
         setLanguageState('en');
       } finally {
         setIsLoading(false);
@@ -49,7 +48,6 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       setLanguageState(newLanguage);
       await AsyncStorage.setItem('app_language', newLanguage);
     } catch (error) {
-      console.error('Error saving language preference:', error);
     }
   };
 

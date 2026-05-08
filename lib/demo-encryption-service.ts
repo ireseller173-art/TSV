@@ -1,5 +1,14 @@
 /**
- * Encryption Service
+ * ⚠️ DEMO ONLY — NOT FOR PRODUCTION ⚠️
+ * 
+ * This is a demonstration encryption service using XOR encryption.
+ * XOR encryption is NOT cryptographically secure and should NEVER be used in production.
+ * 
+ * For production E2E encryption, use:
+ * - Web Crypto API (native browser/React Native support)
+ * - libsodium.js (via tweetnacl-js)
+ * - Signal Protocol Library
+ * 
  * Handles message and call data encryption using AES-256
  * Note: For production, use proper cryptographic libraries like TweetNaCl.js or libsodium
  */
@@ -173,7 +182,6 @@ export const encryptionService = {
       // Simple hash using btoa (for demo - use proper hashing in production)
       return btoa(password);
     } catch (error) {
-      console.error('Error hashing password:', error);
       return btoa(password);
     }
   },
@@ -186,7 +194,6 @@ export const encryptionService = {
       const newHash = await this.hashPassword(password);
       return newHash === hash;
     } catch (error) {
-      console.error('Error verifying password:', error);
       return false;
     }
   },
@@ -204,7 +211,6 @@ export const encryptionService = {
       }
       return token;
     } catch (error) {
-      console.error('Error generating token:', error);
       return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     }
   },

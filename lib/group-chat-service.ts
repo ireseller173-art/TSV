@@ -116,7 +116,6 @@ export async function getAllGroupChats(): Promise<GroupChat[]> {
     const data = await AsyncStorage.getItem(STORAGE_KEY);
     return data ? JSON.parse(data) : [];
   } catch (error) {
-    console.error('Error loading group chats:', error);
     return [];
   }
 }
@@ -356,7 +355,6 @@ export async function getGroupMessages(groupId: string): Promise<GroupChatMessag
     const allMessages: GroupChatMessage[] = data ? JSON.parse(data) : [];
     return allMessages.filter((m) => m.groupId === groupId);
   } catch (error) {
-    console.error('Error loading group messages:', error);
     return [];
   }
 }
@@ -369,7 +367,6 @@ async function getAllGroupMessages(): Promise<GroupChatMessage[]> {
     const data = await AsyncStorage.getItem(MESSAGES_KEY);
     return data ? JSON.parse(data) : [];
   } catch (error) {
-    console.error('Error loading all group messages:', error);
     return [];
   }
 }

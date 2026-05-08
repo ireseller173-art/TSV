@@ -31,24 +31,37 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
-  // Enable CORS for all routes - reflect the request origin to support credentials
+  // CORS configuration with whitelist
+  const allowedOrigins = [
+    process.env.FRONTEND_URL || 'http://localhost:8081',
+    'https://tsv-keeper.app',
+    'https://www.tsv-keeper.app',
+  ];
+
   app.use((req, res, next) => {
     const origin = req.headers.origin;
-    if (origin) {
+    if (origin && allowedOrigins.includes(origin)) {
       res.header("Access-Control-Allow-Origin", origin);
+      res.header("Access-Control-Allow-Credentials", "true");
     }
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     res.header(
       "Access-Control-Allow-Headers",
       "Origin, X-Requested-With, Content-Type, Accept, Authorization",
     );
-    res.header("Access-Control-Allow-Credentials", "true");
 
     // Handle preflight requests
     if (req.method === "OPTIONS") {
       res.sendStatus(200);
       return;
     }
+    
+    // Reject requests from non-whitelisted origins
+    if (origin && !allowedOrigins.includes(origin)) {
+      res.status(403).json({ error: 'CORS policy violation' });
+      return;
+    }
+    
     next();
   });
 

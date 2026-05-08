@@ -75,24 +75,20 @@ export const invitationService = {
       const invitation = await this.verifyInvitation(token);
 
       if (!invitation) {
-        console.error('Invitation not found');
         return false;
       }
 
       if (invitation.status !== 'pending') {
-        console.error('Invitation already processed');
         return false;
       }
 
       if (Date.now() > invitation.expiresAt) {
-        console.error('Invitation expired');
         return false;
       }
 
       // TODO: Update invitation status and create connection between users
       return true;
     } catch (error) {
-      console.error('Error accepting invitation:', error);
       return false;
     }
   },
@@ -105,7 +101,6 @@ export const invitationService = {
       // TODO: Integrate with SMS service (Twilio, AWS SNS, etc.)
       return true;
     } catch (error) {
-      console.error('Error sending SMS invitation:', error);
       return false;
     }
   },
@@ -118,7 +113,6 @@ export const invitationService = {
       // TODO: Integrate with email service (SendGrid, Firebase Functions, etc.)
       return true;
     } catch (error) {
-      console.error('Error sending email invitation:', error);
       return false;
     }
   },

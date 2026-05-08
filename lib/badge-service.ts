@@ -27,7 +27,6 @@ export async function getBadgeCount(): Promise<BadgeCount> {
     }
     return { unreadMessages: 0, missedCalls: 0, total: 0 };
   } catch (error) {
-    console.error('Error getting badge count:', error);
     return { unreadMessages: 0, missedCalls: 0, total: 0 };
   }
 }
@@ -46,7 +45,6 @@ export async function incrementUnreadMessages(count: number = 1): Promise<void> 
     await AsyncStorage.setItem(BADGE_STORAGE_KEY, JSON.stringify(updated));
     await updateAppBadge(updated.total);
   } catch (error) {
-    console.error('Error incrementing unread messages:', error);
   }
 }
 
@@ -64,7 +62,6 @@ export async function incrementMissedCalls(count: number = 1): Promise<void> {
     await AsyncStorage.setItem(BADGE_STORAGE_KEY, JSON.stringify(updated));
     await updateAppBadge(updated.total);
   } catch (error) {
-    console.error('Error incrementing missed calls:', error);
   }
 }
 
@@ -82,7 +79,6 @@ export async function resetUnreadMessages(): Promise<void> {
     await AsyncStorage.setItem(BADGE_STORAGE_KEY, JSON.stringify(updated));
     await updateAppBadge(updated.total);
   } catch (error) {
-    console.error('Error resetting unread messages:', error);
   }
 }
 
@@ -100,7 +96,6 @@ export async function resetMissedCalls(): Promise<void> {
     await AsyncStorage.setItem(BADGE_STORAGE_KEY, JSON.stringify(updated));
     await updateAppBadge(updated.total);
   } catch (error) {
-    console.error('Error resetting missed calls:', error);
   }
 }
 
@@ -117,7 +112,6 @@ export async function resetAllBadges(): Promise<void> {
     await AsyncStorage.setItem(BADGE_STORAGE_KEY, JSON.stringify(updated));
     await updateAppBadge(0);
   } catch (error) {
-    console.error('Error resetting all badges:', error);
   }
 }
 
@@ -133,7 +127,6 @@ async function updateAppBadge(count: number): Promise<void> {
       await Notifications.setBadgeCountAsync(0);
     }
   } catch (error) {
-    console.error('Error updating app badge:', error);
   }
 }
 
@@ -146,7 +139,6 @@ export async function getUnreadCountForChat(chatId: string): Promise<number> {
     const count = await AsyncStorage.getItem(key);
     return count ? parseInt(count, 10) : 0;
   } catch (error) {
-    console.error('Error getting unread count for chat:', error);
     return 0;
   }
 }
@@ -160,7 +152,6 @@ export async function incrementUnreadForChat(chatId: string, count: number = 1):
     const current = await getUnreadCountForChat(chatId);
     await AsyncStorage.setItem(key, (current + count).toString());
   } catch (error) {
-    console.error('Error incrementing unread for chat:', error);
   }
 }
 
@@ -172,7 +163,6 @@ export async function resetUnreadForChat(chatId: string): Promise<void> {
     const key = `unread_chat_${chatId}`;
     await AsyncStorage.removeItem(key);
   } catch (error) {
-    console.error('Error resetting unread for chat:', error);
   }
 }
 
@@ -185,7 +175,6 @@ export async function getMissedCallCountForContact(contactId: string): Promise<n
     const count = await AsyncStorage.getItem(key);
     return count ? parseInt(count, 10) : 0;
   } catch (error) {
-    console.error('Error getting missed call count:', error);
     return 0;
   }
 }
@@ -199,7 +188,6 @@ export async function incrementMissedCallsForContact(contactId: string, count: n
     const current = await getMissedCallCountForContact(contactId);
     await AsyncStorage.setItem(key, (current + count).toString());
   } catch (error) {
-    console.error('Error incrementing missed calls for contact:', error);
   }
 }
 
@@ -211,6 +199,5 @@ export async function resetMissedCallsForContact(contactId: string): Promise<voi
     const key = `missed_calls_${contactId}`;
     await AsyncStorage.removeItem(key);
   } catch (error) {
-    console.error('Error resetting missed calls for contact:', error);
   }
 }

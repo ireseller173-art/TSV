@@ -78,7 +78,6 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
     // Set notification handler
     Notifications.setNotificationHandler({
       handleNotification: async (notification) => {
-        console.log('Notification received:', notification);
         return {
           shouldShowAlert: true,
           shouldPlaySound: true,
@@ -106,9 +105,7 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
   const registerToken = async (currentUserId: string) => {
     try {
       await registerDeviceToken(currentUserId);
-      console.log('[NotificationProvider] Device token registered');
     } catch (error) {
-      console.error('[NotificationProvider] Failed to register device token:', error);
     }
   };
 
@@ -116,20 +113,16 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
     try {
       const prefs = await getNotificationPreferences(currentUserId);
       setPreferences(prefs);
-      console.log('[NotificationProvider] Preferences loaded');
     } catch (error) {
-      console.error('[NotificationProvider] Failed to load preferences:', error);
     }
   };
 
   const requestNotificationPermissions = async (): Promise<string | null> => {
     if (Platform.OS === 'web') {
-      console.log('Push notifications not supported on web');
       return null;
     }
 
     if (!Device.isDevice) {
-      console.log('Push notifications only work on physical devices');
       return null;
     }
 
@@ -142,17 +135,14 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
     }
 
     if (finalStatus !== 'granted') {
-      console.log('Failed to get push token for push notification!');
       return null;
     }
 
     try {
       const projectId = Constants.expoConfig?.extra?.eas?.projectId || Constants.projectId;
       const token = await Notifications.getExpoPushTokenAsync({ projectId });
-      console.log('Expo Push Token:', token.data);
       return token.data;
     } catch (error) {
-      console.error('Error getting push token:', error);
       return null;
     }
   };
@@ -161,23 +151,19 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
     try {
       // Check if notifications are enabled for this type
       if (!preferences?.enabled) {
-        console.log('[NotificationProvider] Notifications disabled globally');
         return;
       }
 
       // Check notification type preferences
       if (payload.type === 'message' && !preferences?.messageNotifications) {
-        console.log('[NotificationProvider] Message notifications disabled');
         return;
       }
 
       if (payload.type === 'group_message' && !preferences?.groupMessageNotifications) {
-        console.log('[NotificationProvider] Group message notifications disabled');
         return;
       }
 
       if (payload.type === 'call' && !preferences?.callNotifications) {
-        console.log('[NotificationProvider] Call notifications disabled');
         return;
       }
 
@@ -195,7 +181,6 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
         trigger: { type: 'time', seconds: 1 } as any,
       });
     } catch (error) {
-      console.error('Error sending local notification:', error);
     }
   };
 
@@ -312,24 +297,18 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
     const data = notification.request.content.data;
     const action = data.action as string;
 
-    console.log('Notification tapped:', action, data);
 
     // Route to appropriate screen based on action
     switch (action) {
       case 'open_chat':
-        console.log('Navigate to chat:', data.chatId);
         break;
       case 'open_group':
-        console.log('Navigate to group:', data.groupId);
         break;
       case 'open_call':
-        console.log('Navigate to call:', data.callId);
         break;
       case 'open_call_history':
-        console.log('Navigate to call history');
         break;
       default:
-        console.log('Unknown action:', action);
     }
   };
 
@@ -337,7 +316,6 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
     try {
       await Notifications.dismissAllNotificationsAsync();
     } catch (error) {
-      console.error('Error clearing notifications:', error);
     }
   };
 
@@ -347,7 +325,6 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
         await Notifications.setBadgeCountAsync(count);
       }
     } catch (error) {
-      console.error('Error setting badge count:', error);
     }
   };
 
@@ -359,9 +336,7 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
     try {
       const updated = await updateNotificationPreferences(preferences.userId, prefs);
       setPreferences(updated);
-      console.log('[NotificationProvider] Preferences updated');
     } catch (error) {
-      console.error('[NotificationProvider] Failed to update preferences:', error);
       throw error;
     }
   };
@@ -376,7 +351,6 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
       const updated = await getNotificationPreferences(preferences.userId);
       setPreferences(updated);
     } catch (error) {
-      console.error('[NotificationProvider] Failed to mute chat:', error);
       throw error;
     }
   };
@@ -391,7 +365,6 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
       const updated = await getNotificationPreferences(preferences.userId);
       setPreferences(updated);
     } catch (error) {
-      console.error('[NotificationProvider] Failed to unmute chat:', error);
       throw error;
     }
   };
@@ -406,7 +379,6 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
       const updated = await getNotificationPreferences(preferences.userId);
       setPreferences(updated);
     } catch (error) {
-      console.error('[NotificationProvider] Failed to mute group:', error);
       throw error;
     }
   };
@@ -421,7 +393,6 @@ export function NotificationProvider({ children, userId }: { children: React.Rea
       const updated = await getNotificationPreferences(preferences.userId);
       setPreferences(updated);
     } catch (error) {
-      console.error('[NotificationProvider] Failed to unmute group:', error);
       throw error;
     }
   };

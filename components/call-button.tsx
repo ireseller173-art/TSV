@@ -2,7 +2,7 @@ import { TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useCall } from "@/lib/call-provider";
-import { useAuth } from "@/lib/auth-provider";
+import { useFirebaseAuth as useAuth } from "@/lib/firebase-auth-provider";
 import Haptics from "expo-haptics";
 import { Platform } from "react-native";
 

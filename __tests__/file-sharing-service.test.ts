@@ -28,7 +28,7 @@ import {
   FileMetadata,
   FileValidationResult,
   FILE_SIZE_LIMITS,
-} from '@/lib/types/file-sharing';
+} from '@/lib/file-sharing-service';
 
 // Mock AsyncStorage
 vi.mock('@react-native-async-storage/async-storage', () => ({

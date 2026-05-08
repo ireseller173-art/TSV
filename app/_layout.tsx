@@ -19,7 +19,7 @@ import type { EdgeInsets, Metrics, Rect } from "react-native-safe-area-context";
 
 import { trpc, createTRPCClient } from "@/lib/trpc";
 import { initManusRuntime, subscribeSafeAreaInsets } from "@/lib/_core/manus-runtime";
-import { AuthProvider } from "@/lib/auth-provider";
+import { FirebaseAuthProvider } from "@/lib/firebase-auth-provider";
 import { CallProvider } from "@/lib/call-provider";
 import { NotificationProvider } from "@/lib/notification-provider";
 import { MessageStatusProvider } from "@/lib/message-status-provider";
@@ -88,7 +88,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
-          <AuthProvider>
+          <FirebaseAuthProvider>
             <CallProvider>
               <NotificationProvider>
                 <MessageStatusProvider>
@@ -112,7 +112,7 @@ export default function RootLayout() {
                 </MessageStatusProvider>
               </NotificationProvider>
             </CallProvider>
-          </AuthProvider>
+          </FirebaseAuthProvider>
         </QueryClientProvider>
       </trpc.Provider>
     </GestureHandlerRootView>

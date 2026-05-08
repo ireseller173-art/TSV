@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
-import { useAuth } from "@/lib/auth-provider";
+import { useFirebaseAuth as useAuth } from "@/lib/firebase-auth-provider";
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 

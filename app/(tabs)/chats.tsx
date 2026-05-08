@@ -12,7 +12,7 @@ import { useRouter } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useColors } from "@/hooks/use-colors";
-import { useAuth } from "@/lib/auth-provider";
+import { useFirebaseAuth as useAuth } from "@/lib/firebase-auth-provider";
 import { useI18n } from "@/lib/i18n-provider";
 
 interface Chat {

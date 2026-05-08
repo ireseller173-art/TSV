@@ -97,7 +97,6 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
           setFirebaseUser(null);
         }
       } catch (err) {
-        console.error('Error fetching user profile:', err);
         setError('Failed to load user profile');
       } finally {
         setIsLoading(false);
@@ -141,7 +140,6 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
         setFirebaseUser(fbUser);
       } catch (err) {
         const authError = err as AuthError;
-        console.error('Sign up error:', authError);
         
         // Handle specific Firebase errors
         if (authError.code === 'auth/email-already-in-use') {
@@ -185,7 +183,6 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
         }
       } catch (err) {
         const authError = err as AuthError;
-        console.error('Sign in error:', authError);
 
         // Handle specific Firebase errors
         if (authError.code === 'auth/user-not-found') {
@@ -227,7 +224,6 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
       setFirebaseUser(null);
     } catch (err) {
       const authError = err as AuthError;
-      console.error('Sign out error:', authError);
       setError(authError.message || 'Sign out failed');
       throw err;
     } finally {
@@ -267,7 +263,6 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
         }
       } catch (err) {
         const authError = err as AuthError;
-        console.error('Update user error:', authError);
         setError(authError.message || 'Failed to update profile');
         throw err;
       }
@@ -281,7 +276,6 @@ export function FirebaseAuthProvider({ children }: { children: React.ReactNode }
       await sendPasswordResetEmail(auth, email);
     } catch (err) {
       const authError = err as AuthError;
-      console.error('Reset password error:', authError);
       setError(authError.message || 'Failed to send reset email');
       throw err;
     }
