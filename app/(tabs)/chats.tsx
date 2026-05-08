@@ -98,7 +98,7 @@ export default function ChatsScreen() {
           <Text className="text-xs text-muted">{item.timestamp}</Text>
           {item.isGroup && (
             <View className="bg-primary/20 px-2 py-1 rounded">
-              <Text className="text-xs text-primary font-semibold">{t('contacts.addContact')}</Text>
+              <Text className="text-xs text-primary font-semibold">GROUP</Text>
             </View>
           )}
         </View>
@@ -120,7 +120,7 @@ export default function ChatsScreen() {
     <ScreenContainer className="flex-1 gap-4" edges={["top", "left", "right"]}>
       <View className="px-4 pt-4 gap-4">
         <View className="flex-row items-center justify-between">
-          <Text className="text-2xl font-bold text-foreground">{t('chat.newMessage')}</Text>
+          <Text className="text-2xl font-bold text-foreground">{t('contacts.title')}</Text>
           <View className="flex-row gap-2">
             <TouchableOpacity
               onPress={() => {
@@ -161,7 +161,7 @@ export default function ChatsScreen() {
         </View>
       ) : filteredChats.length === 0 ? (
         <View className="flex-1 items-center justify-center gap-2">
-          <Text className="text-lg text-muted">{t('chat.newMessage')}</Text>
+          <Text className="text-lg text-muted">{t('contacts.noContacts')}</Text>
           <TouchableOpacity
             onPress={() => {
               // @ts-ignore
@@ -169,7 +169,7 @@ export default function ChatsScreen() {
             }}
             className="mt-4 bg-primary px-6 py-2 rounded-lg"
           >
-            <Text className="text-white font-semibold">{t('chat.send')}</Text>
+            <Text className="text-white font-semibold">{t('chat.call')}</Text>
           </TouchableOpacity>
         </View>
       ) : (

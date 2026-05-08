@@ -97,7 +97,7 @@ export default function ChatDetailScreen() {
       </TouchableOpacity>
       {item.senderId === user?.id && (
         <View className="flex-row gap-1">
-          <MessageStatusIndicator status={item.status || 'sent'} />
+          <MessageStatusIndicator status={item.status || 'sent'} isOwn={true} size="small" />
           <TouchableOpacity
             onPress={() => {
               setEditingMessageId(item.id);
